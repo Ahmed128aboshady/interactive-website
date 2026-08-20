@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أكاديمية كوزمو التفاعلية | CosmoGuide</title>
+    <title>مختبر العلوم التفاعلي | ScienceGuide</title>
     <!-- Google Fonts: Cairo & Tajawal -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,414 +14,378 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Stars & Nebula Simulation -->
+    <!-- Background Stars & Labs Simulation -->
     <div class="space-bg">
         <div class="stars"></div>
         <div class="twinkling"></div>
         <div class="nebula"></div>
     </div>
 
-    <!-- Main Container -->
-    <div class="app-container">
+    <!-- Main App Container: 3 Columns Grid -->
+    <div class="hologram-app-container">
         
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-area">
-                <i class="fa-solid fa-user-astronaut logo-icon"></i>
-                <div class="logo-text">
-                    <h1>كوزمو غايد</h1>
-                    <span>CosmoGuide</span>
-                </div>
+        <!-- ================= LEFT COLUMN: BIOLOGY & CHEMISTRY ================= -->
+        <aside class="hologram-column left-column">
+            <div class="column-header">
+                <i class="fa-solid fa-dna"></i>
+                <span>مختبر الأحياء والكيمياء</span>
             </div>
             
-            <nav class="nav-menu">
-                <ul>
-                    <li class="nav-item active" data-target="sun-section">
-                        <a href="#sun-section">
-                            <i class="fa-solid fa-sun nav-icon"></i>
-                            <span>الشمس الثائرة</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-target="rocky-section">
-                        <a href="#rocky-section">
-                            <i class="fa-solid fa-globe nav-icon"></i>
-                            <span>الكواكب الصخرية</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-target="gas-section">
-                        <a href="#gas-section">
-                            <i class="fa-solid fa-circle-radiation nav-icon"></i>
-                            <span>العمالقة الغازية</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-target="quiz-section">
-                        <a href="#quiz-section">
-                            <i class="fa-solid fa-flask nav-icon"></i>
-                            <span>مختبر المعرفة</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- API Configuration Panel -->
-            <div class="api-settings">
-                <div class="settings-header" id="toggle-settings">
-                    <i class="fa-solid fa-gears"></i>
-                    <span>إعدادات الذكاء الاصطناعي</span>
-                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
-                </div>
-                <div class="settings-content" id="settings-content">
-                    <p class="settings-desc">افتراضياً، يعمل المساعد في وضع المحاكاة المحلي. يمكنك إدخال مفتاح Gemini API لجعله يتحدث بحرية تامة:</p>
-                    <div class="input-group">
-                        <input type="password" id="gemini-key-input" placeholder="أدخل مفتاح Gemini API هنا...">
-                        <button id="save-key-btn"><i class="fa-solid fa-check"></i></button>
+            <div class="column-scroll-content">
+                <!-- Section 1: The Cell -->
+                <section id="cell-section" class="edu-section active-highlight">
+                    <div class="section-badge">علم الأحياء</div>
+                    <h3 class="section-title"><i class="fa-solid fa-circle-nodes text-green"></i> الخلية الحية: وحدة البناء</h3>
+                    <p class="section-subtitle">اضغط على النقاط المضيئة داخل مجسم الخلية لاستكشاف عضياتها ووظائفها.</p>
+                    
+                    <div class="sun-interactive-vertical">
+                        <div class="sun-diagram-box">
+                            <div class="sun-wrapper cell-wrapper">
+                                <div class="sun-glowing-effect cell-glow"></div>
+                                <svg class="sun-svg cell-svg" viewBox="0 0 200 200">
+                                    <!-- Cell Membrane -->
+                                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0, 255, 210, 0.2)" stroke-width="6" class="cell-membrane-orbit"></circle>
+                                    <!-- Cytoplasm (Cell body) -->
+                                    <circle cx="100" cy="100" r="80" fill="url(#cellGrad)" class="cell-body-circle"></circle>
+                                    <!-- Nucleus -->
+                                    <circle cx="100" cy="100" r="28" fill="url(#nucleusGrad)" class="cell-nucleus-circle"></circle>
+                                    <!-- Mitochondria representation -->
+                                    <ellipse cx="60" cy="80" rx="14" ry="7" fill="#ff5100" transform="rotate(-30, 60, 80)"></ellipse>
+                                    
+                                    <defs>
+                                        <radialGradient id="cellGrad" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#00ffd2" stop-opacity="0.3" />
+                                            <stop offset="70%" stop-color="#0a3c36" stop-opacity="0.6" />
+                                            <stop offset="100%" stop-color="#051f1c" stop-opacity="0.9" />
+                                        </radialGradient>
+                                        <radialGradient id="nucleusGrad" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#b026ff" />
+                                            <stop offset="60%" stop-color="#6b0fa3" />
+                                            <stop offset="100%" stop-color="#3d0361" />
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                                <!-- Hotspots -->
+                                <button class="hotspot" style="top: 50%; left: 50%;" data-spot="nucleus" title="النواة">
+                                    <span class="pulse-ring"></span>
+                                    <span class="hotspot-dot">1</span>
+                                </button>
+                                <button class="hotspot" style="top: 40%; left: 30%;" data-spot="mitochondria" title="الميتوكوندريا">
+                                    <span class="pulse-ring"></span>
+                                    <span class="hotspot-dot">2</span>
+                                </button>
+                                <button class="hotspot" style="top: 75%; left: 65%;" data-spot="cytoplasm" title="السيتوبلازم">
+                                    <span class="pulse-ring"></span>
+                                    <span class="hotspot-dot">3</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="sun-details-card glass-panel" id="sun-info-panel">
+                            <div class="card-placeholder-text">
+                                <i class="fa-solid fa-hand-pointer"></i>
+                                <h4>حدد جزءاً من الخلية (1، 2، 3) لعرض وظيفته الحيوية</h4>
+                            </div>
+                            <div class="card-content hidden" id="sun-spot-content">
+                                <h4 id="sun-spot-title" class="text-neon-yellow">اسم العضية</h4>
+                                <p id="sun-spot-text">الشرح والتفاصيل...</p>
+                                <div class="spot-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">الأهمية:</span>
+                                        <span class="stat-value" id="sun-spot-temp">---</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="api-status">
-                        <span class="status-dot simulated"></span>
-                        <span id="status-text">وضع المحاكاة النشط</span>
-                    </div>
-                </div>
-            </div>
+                </section>
 
-            <div class="sidebar-footer">
-                <p>صنع بشغف لتعليم الجيل القادم © 2026</p>
+                <!-- Section 2: Chemistry Elements -->
+                <section id="elements-section" class="edu-section">
+                    <div class="section-badge">علم الكيمياء</div>
+                    <h3 class="section-title"><i class="fa-solid fa-flask-vial text-blue"></i> العناصر والمواد الكيميائية</h3>
+                    <p class="section-subtitle">اضغط على العنصر لمشاهدة عدده الذري، كتلته، وحقائقه الفريدة.</p>
+                    
+                    <div class="planets-grid-compact">
+                        <div class="planet-card-mini glass-panel" data-planet="hydrogen">
+                            <div class="planet-sphere-mini hydrogen-img"></div>
+                            <span>هيدروجين</span>
+                        </div>
+                        <div class="planet-card-mini glass-panel" data-planet="oxygen">
+                            <div class="planet-sphere-mini oxygen-img"></div>
+                            <span>أكسجين</span>
+                        </div>
+                        <div class="planet-card-mini glass-panel active-card" data-planet="carbon">
+                            <div class="planet-sphere-mini carbon-img"></div>
+                            <span>كربون</span>
+                        </div>
+                        <div class="planet-card-mini glass-panel" data-planet="iron">
+                            <div class="planet-sphere-mini iron-img"></div>
+                            <span>حديد</span>
+                        </div>
+                    </div>
+
+                    <!-- Elements detail explorer -->
+                    <div class="planet-explorer-panel glass-panel" id="planet-explorer">
+                        <div class="explorer-header">
+                            <h4 id="explorer-planet-name">عنصر الكربون</h4>
+                            <p id="explorer-planet-desc">العنصر الأساسي لجميع أشكال الحياة العضوية على وجه الأرض.</p>
+                        </div>
+                        <div class="explorer-body-vertical">
+                            <div class="explorer-chart-container">
+                                <div class="progress-bar-group">
+                                    <div class="bar-header">
+                                        <span>العدد الذري (البروتونات)</span>
+                                        <span id="gravity-val">6</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill fill-neon-blue" id="gravity-bar" style="width: 30%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-group">
+                                    <div class="bar-header">
+                                        <span>الكتلة الذرية (جرام/مول)</span>
+                                        <span id="distance-val">12.011</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill fill-neon-green" id="distance-bar" style="width: 45%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-group">
+                                    <div class="bar-header">
+                                        <span>درجة الغليان (مئوية)</span>
+                                        <span id="diameter-val">4,827°م</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill fill-neon-yellow" id="diameter-bar" style="width: 80%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explorer-facts">
+                                <ul id="planet-facts-list">
+                                    <li>يشكل أساس كيمياء الحياة العضوية ويوجد في الفحم والألماس.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="app-header">
-                <div class="header-welcome">
-                    <h2>مرحباً بك في رحلة استكشاف الكون! 🚀</h2>
-                    <p>تصفح الأقسام أدناه أو تحدث مع AstroTutor ليرشدك في جولتك التعليمية.</p>
+        <!-- ================= CENTER COLUMN: THE TEACHER CHARACTER & CHAT ================= -->
+        <main class="hologram-column center-column">
+            
+            <!-- Logo / Top Title -->
+            <div class="center-app-header">
+                <div class="cosmo-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <h2>مستشار العلوم الذكي <span>ScienceTutor</span></h2>
                 </div>
-                <div class="theme-badge">
-                    <i class="fa-solid fa-meteor text-neon"></i>
-                    <span>الوضع التفاعلي نشط</span>
-                </div>
-            </header>
-
-            <!-- Section 1: The Sun -->
-            <section id="sun-section" class="edu-section active-highlight">
-                <div class="section-badge">نجم المجموعة</div>
-                <h3 class="section-title"><i class="fa-solid fa-sun text-yellow"></i> الشمس: قلب المجموعة الشمسية النابض</h3>
-                <p class="section-subtitle">الشمس هي النجم الذي يقع في مركز نظامنا الشمسي، وتشكل 99.8% من كتلته الإجمالية.</p>
-                
-                <div class="sun-interactive-container">
-                    <div class="sun-diagram-box">
-                        <!-- Sun interactive SVG Hotspots -->
-                        <div class="sun-wrapper">
-                            <div class="sun-glowing-effect"></div>
-                            <svg class="sun-svg" viewBox="0 0 200 200">
-                                <!-- Corona / Outer Layer -->
-                                <circle cx="100" cy="100" r="95" fill="none" stroke="rgba(255, 140, 0, 0.2)" stroke-width="8" stroke-dasharray="10 5" class="sun-corona-orbit"></circle>
-                                <!-- Sun Body -->
-                                <circle cx="100" cy="100" r="75" fill="url(#sunGrad)" class="sun-body-circle"></circle>
-                                <!-- Radiant Core -->
-                                <circle cx="100" cy="100" r="30" fill="url(#coreGrad)" class="sun-core-circle"></circle>
-                                
-                                <defs>
-                                    <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#fffb00" />
-                                        <stop offset="70%" stop-color="#ff7b00" />
-                                        <stop offset="100%" stop-color="#ff3c00" />
-                                    </radialGradient>
-                                    <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#ffffff" />
-                                        <stop offset="40%" stop-color="#fffb00" />
-                                        <stop offset="100%" stop-color="transparent" />
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                            <!-- Clickable Hotspots -->
-                            <button class="hotspot" style="top: 50%; left: 50%;" data-spot="core" title="لب الشمس">
-                                <span class="pulse-ring"></span>
-                                <span class="hotspot-dot">1</span>
-                            </button>
-                            <button class="hotspot" style="top: 25%; left: 60%;" data-spot="photosphere" title="الغلاف الضوئي">
-                                <span class="pulse-ring"></span>
-                                <span class="hotspot-dot">2</span>
-                            </button>
-                            <button class="hotspot" style="top: 75%; left: 20%;" data-spot="corona" title="الإكليل (الهالة)">
-                                <span class="pulse-ring"></span>
-                                <span class="hotspot-dot">3</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="sun-details-card glass-panel" id="sun-info-panel">
-                        <div class="card-placeholder-text">
-                            <i class="fa-solid fa-hand-pointer"></i>
-                            <h4>اضغط على النقاط المضيئة (1، 2، 3) في مجسم الشمس لاستكشاف طبقاتها!</h4>
-                        </div>
-                        <div class="card-content hidden" id="sun-spot-content">
-                            <h4 id="sun-spot-title" class="text-neon-yellow">اسم الطبقة</h4>
-                            <p id="sun-spot-text">الشرح والتفاصيل...</p>
-                            <div class="spot-stats">
-                                <div class="stat-item">
-                                    <span class="stat-label">درجة الحرارة:</span>
-                                    <span class="stat-value" id="sun-spot-temp">---</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 2: Rocky Planets -->
-            <section id="rocky-section" class="edu-section">
-                <div class="section-badge">كواكب صلبة</div>
-                <h3 class="section-title"><i class="fa-solid fa-globe text-blue"></i> الكواكب الصخرية: العوالم القريبة</h3>
-                <p class="section-subtitle">الكواكب الأربعة الأقرب للشمس؛ تتميز بأسطحها الصخرية الصلبة وأحجامها الصغيرة نسبياً مقارنة بالعمالقة الغازية.</p>
-                
-                <div class="planets-grid">
-                    <!-- Mercury -->
-                    <div class="planet-card glass-panel" data-planet="mercury">
-                        <div class="planet-avatar mercury-img"></div>
-                        <h4>عطارد</h4>
-                        <span class="planet-sub">أقرب الكواكب للشمس</span>
-                        <div class="planet-mini-stats">
-                            <span><i class="fa-solid fa-temperature-high"></i> 430°م</span>
-                            <span><i class="fa-solid fa-clock"></i> يوم طويل</span>
-                        </div>
-                    </div>
-                    <!-- Venus -->
-                    <div class="planet-card glass-panel" data-planet="venus">
-                        <div class="planet-avatar venus-img"></div>
-                        <h4>الزهرة</h4>
-                        <span class="planet-sub">توأم الأرض الملتهب</span>
-                        <div class="planet-mini-stats">
-                            <span><i class="fa-solid fa-temperature-high"></i> 475°م</span>
-                            <span><i class="fa-solid fa-cloud-showers-heavy"></i> غيوم حمضية</span>
-                        </div>
-                    </div>
-                    <!-- Earth -->
-                    <div class="planet-card glass-panel active-card" data-planet="earth">
-                        <div class="planet-avatar earth-img"></div>
-                        <h4>الأرض</h4>
-                        <span class="planet-sub">واحة الحياة الزرقاء</span>
-                        <div class="planet-mini-stats">
-                            <span><i class="fa-solid fa-tint"></i> مياه وفيرة</span>
-                            <span><i class="fa-solid fa-users"></i> غلاف حيوي</span>
-                        </div>
-                    </div>
-                    <!-- Mars -->
-                    <div class="planet-card glass-panel" data-planet="mars">
-                        <div class="planet-avatar mars-img"></div>
-                        <h4>المريخ</h4>
-                        <span class="planet-sub">الكوكب الأحمر الواعد</span>
-                        <div class="planet-mini-stats">
-                            <span><i class="fa-solid fa-temperature-low"></i> -62°م</span>
-                            <span><i class="fa-solid fa-mountain"></i> جبال عملاقة</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Planet detail explorer -->
-                <div class="planet-explorer-panel glass-panel" id="planet-explorer">
-                    <div class="explorer-header">
-                        <h4 id="explorer-planet-name">كوكب الأرض</h4>
-                        <p id="explorer-planet-desc">الكوكب الوحيد المعروف بإيوائه للحياة في الكون حتى الآن.</p>
-                    </div>
-                    <div class="explorer-body">
-                        <div class="explorer-chart-container">
-                            <div class="progress-bar-group">
-                                <div class="bar-header">
-                                    <span>الجاذبية (مقارنة بالجاذبية الأرضية)</span>
-                                    <span id="gravity-val">1.0g</span>
-                                </div>
-                                <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill fill-neon-blue" id="gravity-bar" style="width: 100%;"></div>
-                                </div>
-                            </div>
-                            <div class="progress-bar-group">
-                                <div class="bar-header">
-                                    <span>المسافة من الشمس (وحدة فلكية AU)</span>
-                                    <span id="distance-val">1.0 AU</span>
-                                </div>
-                                <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill fill-neon-green" id="distance-bar" style="width: 25%;"></div>
-                                </div>
-                            </div>
-                            <div class="progress-bar-group">
-                                <div class="bar-header">
-                                    <span>القطر الاستوائي (كم)</span>
-                                    <span id="diameter-val">12,742 كم</span>
-                                </div>
-                                <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill fill-neon-yellow" id="diameter-bar" style="width: 50%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="explorer-facts">
-                            <h5>حقائق مثيرة:</h5>
-                            <ul id="planet-facts-list">
-                                <li>يمتلك غلافاً جوياً غنياً بالأكسجين والنيتروجين يسمح بالتنفس وحماية الكائنات.</li>
-                                <li>تغطي المحيطات المائية السائلة حوالي 71% من مساحة سطحه.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 3: Gas Giants -->
-            <section id="gas-section" class="edu-section">
-                <div class="section-badge">كواكب غازية</div>
-                <h3 class="section-title"><i class="fa-solid fa-circle-radiation text-purple"></i> العمالقة الغازية: حراس النظام الخارجي</h3>
-                <p class="section-subtitle">كواكب ضخمة تقع خلف حزام الكويكبات، وتتكون بشكل رئيسي من الهيدروجين والهيليوم بدون سطح صلب حقيقي.</p>
-                
-                <div class="gas-interactive-container">
-                    <div class="orbit-simulation glass-panel">
-                        <!-- Simulated orbit models -->
-                        <div class="system-orbits">
-                            <div class="orbit-line o-jupiter">
-                                <div class="orbit-planet p-jupiter" data-gas="jupiter">
-                                    <span class="planet-tooltip">المشتري</span>
-                                </div>
-                            </div>
-                            <div class="orbit-line o-saturn">
-                                <div class="orbit-planet p-saturn" data-gas="saturn">
-                                    <span class="planet-tooltip">زحل</span>
-                                </div>
-                            </div>
-                            <div class="orbit-line o-uranus">
-                                <div class="orbit-planet p-uranus" data-gas="uranus">
-                                    <span class="planet-tooltip">أورانوس</span>
-                                </div>
-                            </div>
-                            <div class="orbit-line o-neptune">
-                                <div class="orbit-planet p-neptune" data-gas="neptune">
-                                    <span class="planet-tooltip">نبتون</span>
-                                </div>
-                            </div>
-                            <div class="center-star"></div>
-                        </div>
-                        <span class="simulation-tip"><i class="fa-solid fa-circle-info"></i> اضغط على الكواكب التي تدور في المحاكاة لعرض خصائصها الغازية الفريدة!</span>
-                    </div>
-
-                    <div class="gas-details-panel glass-panel" id="gas-details">
-                        <h4 id="gas-planet-title">المشتري (ملك الكواكب)</h4>
-                        <p id="gas-planet-desc">أكبر كواكب المجموعة الشمسية حجماً وأكثرها كتلة، ويعمل كدرع واقٍ للأرض عن طريق جذب المذنبات البعيدة بجاذبيته الهائلة.</p>
-                        <div class="gas-visuals">
-                            <div class="gas-gas-indicator">
-                                <span class="label">المكون الرئيسي للغلاف:</span>
-                                <div class="gas-tags">
-                                    <span class="gas-tag">هيدروجين H₂</span>
-                                    <span class="gas-tag">هيليوم He</span>
-                                </div>
-                            </div>
-                            <div class="gas-moons-counter">
-                                <i class="fa-solid fa-moon"></i>
-                                <div>
-                                    <span class="moons-num" id="gas-moons-val">95</span>
-                                    <span class="moons-label">قمراً مؤكداً</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 4: Discovery Lab (Interactive Quiz) -->
-            <section id="quiz-section" class="edu-section">
-                <div class="section-badge">اختبر ذكاءك</div>
-                <h3 class="section-title"><i class="fa-solid fa-flask text-teal"></i> مختبر المعرفة: كويز الفضاء التفاعلي</h3>
-                <p class="section-subtitle">اختبر ما تعلمته في جولتك العلمية مع AstroTutor. أجب على الأسئلة الثلاثة التالية لتكتشف مستواك!</p>
-                
-                <div class="quiz-container glass-panel">
-                    <div id="quiz-intro">
-                        <h4>هل أنت مستعد لبدء التحدي؟</h4>
-                        <p>الأسئلة تقيس مستوى فهمك للشمس والكواكب الصخرية والغازية.</p>
-                        <button class="action-btn" id="start-quiz-btn">ابدأ الاختبار الآن 🚀</button>
-                    </div>
-
-                    <div id="quiz-play" class="hidden">
-                        <div class="quiz-progress-bar">
-                            <div class="quiz-progress-fill" id="quiz-progress-fill" style="width: 33%;"></div>
-                        </div>
-                        <div class="question-header">
-                            <span class="question-number" id="question-num">السؤال 1 من 3</span>
-                            <h4 id="question-text">السؤال يظهر هنا...</h4>
-                        </div>
-                        <div class="answers-grid" id="answers-grid">
-                            <!-- Answer buttons dynamically generated -->
-                        </div>
-                    </div>
-
-                    <div id="quiz-result" class="hidden">
-                        <div class="result-animation">
-                            <i class="fa-solid fa-trophy trophy-icon"></i>
-                        </div>
-                        <h4 id="result-title">عمل رائع، يا رائد الفضاء!</h4>
-                        <p id="result-text">لقد حصلت على درجة 3/3 بنسبة نجاح 100%.</p>
-                        <div class="result-actions">
-                            <button class="action-btn btn-secondary" id="restart-quiz-btn">إعادة المحاولة <i class="fa-solid fa-rotate-right"></i></button>
-                            <button class="action-btn" id="ask-ai-result-btn">اسأل AstroTutor عن النتيجة <i class="fa-solid fa-comment-dots"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- AI Assistant Sidebar -->
-        <aside class="chat-sidebar">
-            <div class="chat-header">
-                <div class="tutor-profile">
-                    <div class="avatar-container">
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=AstroTutor&backgroundColor=0f172a" alt="AstroTutor Avatar" class="tutor-avatar">
-                        <span class="online-indicator"></span>
-                    </div>
-                    <div class="tutor-info">
-                        <h4>AstroTutor</h4>
-                        <span>المعلم الفلكي الذكي</span>
-                    </div>
-                </div>
-                <button class="clear-chat-btn" id="clear-chat-btn" title="مسح المحادثة">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
-
-            <!-- Scrollable chat body -->
-            <div class="chat-body" id="chat-messages">
-                <!-- Welcome Message -->
-                <div class="message tutor-msg animate-fade-in">
-                    <div class="msg-bubble">
-                        <p>مرحباً بك! أنا **AstroTutor**، معلمك الفلكي الذكي المساعد. 🌌</p>
-                        <p>يمكنك سؤالي عن أي شيء يخص الفضاء والمجموعة الشمسية. سأشرح لك المعلومات وسأقوم بتوجيهك وتمرير الصفحة تلقائياً للأقسام التي نتحدث عنها!</p>
-                        <p>جرب كتابة: **"كلمنا عن كوكب المريخ"** أو **"اشرح لي طبقات الشمس"**.</p>
-                    </div>
-                    <span class="msg-time">الآن</span>
+                <div class="api-toggle-badge" id="toggle-api-settings" title="إعدادات الذكاء الاصطناعي">
+                    <i class="fa-solid fa-gears"></i>
+                    <span id="api-badge-text">وضع المحاكاة</span>
                 </div>
             </div>
 
-            <!-- Interactive Guidance Banner -->
-            <div class="guidance-banner hidden" id="guidance-banner">
+            <!-- Floating Character Arena -->
+            <div class="character-arena">
+                <!-- Holo Pedestal -->
+                <div class="holo-pedestal">
+                    <div class="holo-light"></div>
+                    <div class="holo-rings">
+                        <div class="ring-r1"></div>
+                        <div class="ring-r2"></div>
+                    </div>
+                </div>
+
+                <!-- Animated CSS Robot Character (ScienceTutor) -->
+                <div class="astrotutor-character">
+                    <div class="robot-head teacher-head">
+                        <div class="robot-ears"></div>
+                        <!-- Glasses Overlay to make him look like a teacher -->
+                        <div class="teacher-glasses">
+                            <span class="lens"></span>
+                            <span class="bridge"></span>
+                            <span class="lens"></span>
+                        </div>
+                        <div class="robot-face">
+                            <div class="robot-eyes">
+                                <span class="eye eye-left"></span>
+                                <span class="eye eye-right"></span>
+                            </div>
+                            <div class="robot-mouth smile"></div>
+                        </div>
+                        <div class="robot-antenna">
+                            <span class="antenna-tip"></span>
+                        </div>
+                    </div>
+                    <div class="robot-body teacher-body">
+                        <!-- Lab coat tie representation -->
+                        <div class="lab-coat-tie"></div>
+                        <div class="robot-screen">
+                            <div class="sine-wave"></div>
+                        </div>
+                        <div class="robot-joints"></div>
+                    </div>
+                    <div class="robot-hands">
+                        <div class="hand hand-left"></div>
+                        <div class="hand hand-right"></div>
+                    </div>
+                    <div class="robot-shadow"></div>
+                </div>
+            </div>
+
+            <!-- Dynamic Chat Bubble Above character -->
+            <div class="central-chat-area">
+                <div class="tutor-chat-bubble glass-panel" id="tutor-bubble">
+                    <div class="bubble-header">
+                        <span class="tutor-title"><i class="fa-solid fa-chalkboard-user"></i> مستر شريف (معلم العلوم):</span>
+                        <button class="clear-chat-btn" id="clear-chat-btn" title="مسح السجل"><i class="fa-solid fa-rotate-left"></i></button>
+                    </div>
+                    <div class="bubble-body" id="chat-messages-container">
+                        <div id="latest-tutor-message" class="animate-fade-in">
+                            <p>مرحباً بك يا بطل في مختبر العلوم التفاعلي! 🧪🧬</p>
+                            <p>أنا **مستر شريف** معلم العلوم الخاص بك. سأقوم بشرح الدروس وتوجيه الصفحة معك. </p>
+                            <p>اضغط على **زر المايك 🎤 وتحدث بصوتك مباشرة** لتسألني، أو جرب كتابة: **"اشرح لي الخلية الحية"**، **"كلمني عن عنصر الأكسجين"**، أو **"عايز أحل الكويز"**.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guidance Navigation Banner -->
+            <div class="guidance-banner-center hidden" id="guidance-banner">
                 <i class="fa-solid fa-compass-drafting spinner-icon"></i>
-                <span id="guidance-text">يقوم AstroTutor بتوجيه الصفحة حالياً...</span>
+                <span id="guidance-text">يقوم مستر شريف بتوجيه الصفحة وتجهيز الشرح...</span>
             </div>
 
-            <!-- Quick Questions Prompts -->
-            <div class="quick-prompts">
-                <button class="prompt-chip" data-prompt="اشرح لي طبقات الشمس بالتفصيل">☀️ طبقات الشمس</button>
-                <button class="prompt-chip" data-prompt="قارن بين كوكبي الأرض والمريخ">🪐 مقارنة الأرض والمريخ</button>
-                <button class="prompt-chip" data-prompt="ما هو أكبر كوكب في المجموعة الشمسية؟">⭐ أكبر كوكب</button>
+            <!-- Prompt recommendations chips -->
+            <div class="quick-prompts-center">
+                <button class="prompt-chip" data-prompt="اشرح لي عضيات الخلية الحية ووظائفها">🧬 شرح الخلية</button>
+                <button class="prompt-chip" data-prompt="قارن بين الأكسجين والحديد كعناصر كيميائية">🧪 الأكسجين والحديد</button>
+                <button class="prompt-chip" data-prompt="ما هي الفروقات بين الحالة الصلبة والسائلة والغازية للمادة؟">🌡️ حالات المادة</button>
             </div>
 
-            <!-- Input area -->
-            <div class="chat-input-area">
-                <textarea id="chat-input" placeholder="اسأل AstroTutor شيئاً..." rows="1"></textarea>
+            <!-- Unified input area with MIC button at the bottom -->
+            <div class="center-input-console glass-panel">
+                <!-- Microphone Voice Recognition Button -->
+                <button id="mic-btn" class="mic-btn" title="تحدث بصوتك (تسجيل)">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <textarea id="chat-input" placeholder="اضغط على المايك وتحدث أو اكتب سؤالك هنا..." rows="1"></textarea>
                 <button id="send-btn" class="send-btn">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
+
+            <!-- API Configuration Modal / Panel Overlay -->
+            <div class="api-settings-overlay hidden" id="api-settings-panel">
+                <div class="api-modal-card glass-panel animate-fade-in">
+                    <div class="modal-header">
+                        <h4><i class="fa-solid fa-gears"></i> إعدادات معالج الذكاء الاصطناعي</h4>
+                        <button class="close-modal-btn" id="close-settings-btn"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>بشكل افتراضي، يعمل المساعد في وضع المحاكاة الذكية محلياً. أدخل مفتاحك لربطه بالذكاء الاصطناعي المباشر من Google:</p>
+                        <div class="input-group">
+                            <input type="password" id="gemini-key-input" placeholder="أدخل مفتاح Gemini API هنا...">
+                            <button id="save-key-btn">حفظ وتفعيل</button>
+                        </div>
+                        <div class="api-status">
+                            <span class="status-dot simulated"></span>
+                            <span id="status-text">وضع المحاكاة النشط</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ================= RIGHT COLUMN: PHYSICS & QUIZ ================= -->
+        <aside class="hologram-column right-column">
+            <div class="column-header">
+                <i class="fa-solid fa-atom"></i>
+                <span>مختبر الفيزياء والتقييم</span>
+            </div>
+
+            <div class="column-scroll-content">
+                <!-- Section 3: States of Matter -->
+                <section id="states-section" class="edu-section">
+                    <div class="section-badge">علم الفيزياء</div>
+                    <h3 class="section-title"><i class="fa-solid fa-temperature-empty text-purple"></i> حالات المادة وحركة الجزيئات</h3>
+                    <p class="section-subtitle">اضغط على حالة المادة لمشاهدة سلوك جزيئاتها الذري تحت تأثير الحرارة.</p>
+                    
+                    <div class="gas-interactive-vertical">
+                        <div class="orbit-simulation-box glass-panel">
+                            <!-- Molecular particles simulation box -->
+                            <div class="particles-simulation" id="particles-container">
+                                <!-- Particles generated dynamically via JS to represent solid, liquid, gas -->
+                            </div>
+                        </div>
+
+                        <div class="gas-details-panel glass-panel" id="gas-details">
+                            <div class="states-buttons">
+                                <button class="state-btn active-state" data-state="solid">الصلبة</button>
+                                <button class="state-btn" data-state="liquid">السائلة</button>
+                                <button class="state-btn" data-state="gas">الغازية</button>
+                            </div>
+                            <h4 id="gas-planet-title" style="margin-top:12px;">الحالة الصلبة</h4>
+                            <p id="gas-planet-desc">تكون جزيئات المادة متقاربة جداً ومتراصة بقوة، وتتحرك حركة اهتزازية بسيطة في مكانها دون الانتقال.</p>
+                            <div class="gas-visuals">
+                                <div class="gas-gas-indicator">
+                                    <div class="gas-tags">
+                                        <span class="gas-tag" id="state-energy-tag">طاقة حركية منخفضة</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Science Quiz -->
+                <section id="quiz-section" class="edu-section">
+                    <div class="section-badge">مختبر المعرفة</div>
+                    <h3 class="section-title"><i class="fa-solid fa-flask text-teal"></i> كويز العلوم التفاعلي</h3>
+                    <p class="section-subtitle">أجب عن الأسئلة واكسب تقييم مستر شريف الممتاز في سجل الصف الدراسي.</p>
+                    
+                    <div class="quiz-container-compact glass-panel">
+                        <div id="quiz-intro">
+                            <h4>هل أنت جاهز لتحدي مستر شريف العلمي؟</h4>
+                            <button class="action-btn-compact" id="start-quiz-btn">ابدأ كويز العلوم 🚀</button>
+                        </div>
+
+                        <div id="quiz-play" class="hidden">
+                            <div class="quiz-progress-bar">
+                                <div class="quiz-progress-fill" id="quiz-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <div class="question-header">
+                                <span class="question-number" id="question-num">السؤال 1 من 3</span>
+                                <h4 id="question-text">السؤال يظهر هنا...</h4>
+                            </div>
+                            <div class="answers-grid-vertical" id="answers-grid">
+                                <!-- Answer buttons dynamic -->
+                            </div>
+                        </div>
+
+                        <div id="quiz-result" class="hidden">
+                            <i class="fa-solid fa-trophy trophy-icon-mini"></i>
+                            <h4 id="result-title">رائع جداً!</h4>
+                            <p id="result-text">لقد حصلت على درجة 3/3.</p>
+                            <div class="result-actions-vertical">
+                                <button class="action-btn-compact btn-secondary" id="restart-quiz-btn">إعادة الاختبار <i class="fa-solid fa-rotate-right"></i></button>
+                                <button class="action-btn-compact" id="ask-ai-result-btn">اسأل مستر شريف عن تقييمك</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </aside>
+
     </div>
 
     <!-- Notification Toast -->
     <div class="toast hidden" id="toast">
         <i class="fa-solid fa-info-circle toast-icon"></i>
-        <span class="toast-message" id="toast-message">تم حفظ إعدادات مفتاح API بنجاح!</span>
+        <span class="toast-message" id="toast-message">رسالة التنبيه</span>
     </div>
 
     <!-- Scripts -->
