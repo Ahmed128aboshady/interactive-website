@@ -15,6 +15,381 @@ document.addEventListener('DOMContentLoaded', () => {
     const guidanceBanner = document.getElementById('guidance-banner');
     const guidanceText = document.getElementById('guidance-text');
     
+    // Layout mode elements
+    const appContainer = document.querySelector('.hologram-app-container');
+    const toggleViewBtn = document.getElementById('toggle-view-mode');
+    const viewBadgeText = document.getElementById('view-badge-text');
+
+    // Sound & TTS Speech Control
+    const toggleSoundBtn = document.getElementById('toggle-sound');
+    const soundBadgeText = document.getElementById('sound-badge-text');
+    let isSoundEnabled = true; // Force enabled by default
+    localStorage.setItem('astrotutor_sound', 'enabled');
+
+    let currentAudioObject = null;
+    let audioUnlocked = false;
+
+    // Unlock audio context & speechSynthesis queue on first user interaction
+    function unlockAudioOnGesture() {
+        if (audioUnlocked) return;
+        audioUnlocked = true;
+        if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.resume(); } catch(e){}
+        }
+        document.removeEventListener('click', unlockAudioOnGesture);
+        document.removeEventListener('touchstart', unlockAudioOnGesture);
+    }
+    document.addEventListener('click', unlockAudioOnGesture);
+    document.addEventListener('touchstart', unlockAudioOnGesture);
+
+    function updateSoundBadge(triggerTest = false) {
+        if (!toggleSoundBtn) return;
+        const icon = toggleSoundBtn.querySelector('i');
+        if (isSoundEnabled) {
+            toggleSoundBtn.classList.remove('muted-mode');
+            if (icon) icon.className = 'fa-solid fa-volume-high';
+            if (soundBadgeText) soundBadgeText.textContent = 'الصوت مفعل';
+            if (triggerTest) {
+                speakText("أهلاً بك يا صديقي! مستر شريف جاهز للشرح والتحدث معك.");
+            }
+        } else {
+            toggleSoundBtn.classList.add('muted-mode');
+            if (icon) icon.className = 'fa-solid fa-volume-xmark';
+            if (soundBadgeText) soundBadgeText.textContent = 'الصوت مكتوم';
+            if (window.responsiveVoice) window.responsiveVoice.cancel();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (currentAudioObject) {
+                currentAudioObject.pause();
+                currentAudioObject = null;
+            }
+        }
+    }
+
+    if (toggleSoundBtn) {
+        updateSoundBadge(false);
+        toggleSoundBtn.addEventListener('click', () => {
+            isSoundEnabled = !isSoundEnabled;
+            localStorage.setItem('astrotutor_sound', isSoundEnabled ? 'enabled' : 'disabled');
+            updateSoundBadge(true); // Speak test phrase on click!
+        });
+    }
+
+    // Pre-load voices on load if supported
+    if ('speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        } catch(e){}
+    }
+
+    // ElevenLabs & Settings Modal Control
+    const apiSettingsModal = document.getElementById('api-settings-modal');
+    const toggleApiBtn = document.getElementById('toggle-api-settings');
+    const closeApiModalBtn = document.getElementById('close-api-modal');
+    const saveApiKeysBtn = document.getElementById('save-api-keys-btn');
+    const geminiInput = document.getElementById('gemini-api-key-input');
+    const elevenlabsKeyInput = document.getElementById('elevenlabs-api-key-input');
+    const elevenlabsVoiceInput = document.getElementById('elevenlabs-voice-id-input');
+
+    // API keys are entered by the user via the Settings modal (⚙️ button)
+    // and stored securely in the browser's localStorage - never hardcoded here
+
+    if (geminiInput) geminiInput.value = localStorage.getItem('gemini_api_key') || '';
+    if (elevenlabsKeyInput) elevenlabsKeyInput.value = localStorage.getItem('elevenlabs_api_key') || '';
+    if (elevenlabsVoiceInput) elevenlabsVoiceInput.value = localStorage.getItem('elevenlabs_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+
+    function openSettingsModal() {
+        if (apiSettingsModal) apiSettingsModal.classList.remove('hidden');
+    }
+    function closeSettingsModal() {
+        if (apiSettingsModal) apiSettingsModal.classList.add('hidden');
+    }
+
+    if (toggleApiBtn) toggleApiBtn.addEventListener('click', openSettingsModal);
+    if (closeApiModalBtn) closeApiModalBtn.addEventListener('click', closeSettingsModal);
+
+    if (saveApiKeysBtn) {
+        saveApiKeysBtn.addEventListener('click', () => {
+            if (geminiInput) localStorage.setItem('gemini_api_key', geminiInput.value.trim());
+            if (elevenlabsKeyInput) localStorage.setItem('elevenlabs_api_key', elevenlabsKeyInput.value.trim());
+            if (elevenlabsVoiceInput) localStorage.setItem('elevenlabs_voice_id', elevenlabsVoiceInput.value.trim());
+            
+            showToast('تم حفظ مفاتيح ElevenLabs و Gemini API بنجاح! 🚀');
+            closeSettingsModal();
+        });
+    }
+
+    async function speakWithElevenLabs(cleanText) {
+        const apiKey = localStorage.getItem('elevenlabs_api_key') || (elevenlabsKeyInput ? elevenlabsKeyInput.value.trim() : '');
+        const voiceId = localStorage.getItem('elevenlabs_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+
+        if (!apiKey) {
+            return false; // Silently fallback without forcing modal pop up
+        }
+
+        const robotChar = document.querySelector('.astrotutor-character');
+
+        try {
+            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'audio/mpeg',
+                    'xi-api-key': apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: cleanText.substring(0, 300),
+                    model_id: 'eleven_multilingual_v2',
+                    voice_settings: {
+                        stability: 0.5,
+                        similarity_boost: 0.75
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                console.warn('ElevenLabs API returned status:', response.status);
+                return false;
+            }
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            currentAudioObject = audio;
+
+            audio.onplay = () => {
+                if (robotChar) robotChar.classList.add('is-speaking');
+            };
+
+            audio.onended = audio.onerror = () => {
+                if (robotChar) robotChar.classList.remove('is-speaking');
+                currentAudioObject = null;
+            };
+
+            await audio.play();
+            return true;
+        } catch (err) {
+            console.warn('ElevenLabs Speech fetch exception:', err);
+            if (robotChar) robotChar.classList.remove('is-speaking');
+            return false;
+        }
+    }
+
+    async function speakWithOpenAITTS(cleanText) {
+        const apiKey = localStorage.getItem('elevenlabs_api_key') || localStorage.getItem('openai_api_key') || '';
+        if (!apiKey || (!apiKey.startsWith('sk-') && !apiKey.startsWith('sk_'))) return false;
+
+        const robotChar = document.querySelector('.astrotutor-character');
+        const audioPlayer = document.getElementById('tutor-audio-player');
+
+        try {
+            const response = await fetch('https://api.openai.com/v1/audio/speech', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'tts-1',
+                    input: cleanText.substring(0, 300),
+                    voice: 'alloy'
+                })
+            });
+
+            if (!response.ok) {
+                console.warn('OpenAI TTS API returned status:', response.status);
+                return false;
+            }
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            if (audioPlayer) {
+                audioPlayer.src = audioUrl;
+                audioPlayer.onplay = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
+                audioPlayer.onended = audioPlayer.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); };
+                await audioPlayer.play();
+                return true;
+            } else {
+                const audio = new Audio(audioUrl);
+                currentAudioObject = audio;
+                audio.onplay = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
+                audio.onended = audio.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); currentAudioObject = null; };
+                await audio.play();
+                return true;
+            }
+        } catch (err) {
+            console.warn('OpenAI TTS exception:', err);
+            return false;
+        }
+    }
+
+    // Pre-load voices when page starts and cache them
+    let cachedVoices = [];
+    function loadVoices() {
+        const v = window.speechSynthesis.getVoices();
+        if (v.length > 0) cachedVoices = v;
+        return cachedVoices;
+    }
+    if ('speechSynthesis' in window) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function getBestArabicVoice() {
+        const voices = loadVoices();
+        // Priority: ar-SA → ar-EG → any ar-*
+        return voices.find(v => v.lang === 'ar-SA') ||
+               voices.find(v => v.lang === 'ar-EG') ||
+               voices.find(v => v.lang && v.lang.startsWith('ar')) ||
+               null;
+    }
+
+    // Test voice button — tests local gTTS server
+    const testVoiceBtn = document.getElementById('test-voice-btn');
+    if (testVoiceBtn) {
+        testVoiceBtn.addEventListener('click', () => {
+            const testText = 'مرحباً أنا مستر شريف معلم العلوم التفاعلي';
+            const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(testText)}`;
+            showToast('🔊 جاري تشغيل الصوت العربي...');
+            const audio = new Audio(ttsUrl);
+            audio.oncanplay = () => {
+                audio.play();
+                showToast('✅ الصوت العربي يعمل بنجاح!');
+            };
+            audio.onerror = () => {
+                showToast('❌ تأكد إن السيرفر شغال: python tts_server.py');
+            };
+        });
+    }
+
+    function cleanForSpeech(text) {
+        return text
+            .replace(/\[NAV:[^\]]+\]/g, '')
+            .replace(/\*\*([^*]+)\*\*/g, '$1')
+            .replace(/[*_#`~]/g, '')
+            .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function speakText(text) {
+        if (!isSoundEnabled) return;
+
+        const robotChar = document.querySelector('.astrotutor-character');
+        const cleanText = cleanForSpeech(text).substring(0, 300);
+        if (!cleanText) return;
+
+        // Use local gTTS server for real Arabic speech
+        const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(cleanText)}`;
+        const audioPlayer = document.getElementById('tutor-audio-player');
+
+        if (robotChar) robotChar.classList.add('is-speaking');
+
+        if (audioPlayer) {
+            audioPlayer.src = ttsUrl;
+            audioPlayer.onended = audioPlayer.onerror = () => {
+                if (robotChar) robotChar.classList.remove('is-speaking');
+            };
+            audioPlayer.play().catch(() => {
+                if (robotChar) robotChar.classList.remove('is-speaking');
+            });
+        } else {
+            const audio = new Audio(ttsUrl);
+            audio.onended = audio.onerror = () => {
+                if (robotChar) robotChar.classList.remove('is-speaking');
+            };
+            audio.play().catch(() => {
+                if (robotChar) robotChar.classList.remove('is-speaking');
+            });
+        }
+    }
+
+    function speakWithWebSpeech(cleanText, robotChar) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'ar';
+        utterance.rate = 0.85;
+        utterance.volume = 1.0;
+        utterance.onstart = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
+        utterance.onend = utterance.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); };
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function expandSelectiveSection(sectionId) {
+        if (!appContainer) return;
+
+        // Clear layout state classes
+        appContainer.classList.remove('simple-mode', 'expanded-mode', 'show-left-only', 'show-right-only', 'show-full-all');
+
+        // Hide all sections initially
+        sections.forEach(sec => {
+            sec.classList.add('section-hidden');
+        });
+
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.remove('section-hidden');
+            
+            // Choose column based on section
+            if (sectionId === 'cell-section' || sectionId === 'elements-section') {
+                appContainer.classList.add('show-left-only');
+            } else if (sectionId === 'states-section' || sectionId === 'quiz-section') {
+                appContainer.classList.add('show-right-only');
+            } else {
+                appContainer.classList.add('show-full-all');
+            }
+        } else {
+            appContainer.classList.add('show-full-all');
+            sections.forEach(sec => sec.classList.remove('section-hidden'));
+        }
+
+        if (viewBadgeText) viewBadgeText.textContent = 'الوضع البسيط';
+        if (toggleViewBtn) {
+            const icon = toggleViewBtn.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-compress';
+        }
+    }
+
+    function showAllSections() {
+        if (!appContainer) return;
+        appContainer.classList.remove('simple-mode', 'show-left-only', 'show-right-only');
+        appContainer.classList.add('show-full-all');
+        sections.forEach(sec => {
+            sec.classList.remove('section-hidden');
+        });
+        if (viewBadgeText) viewBadgeText.textContent = 'الوضع البسيط';
+        if (toggleViewBtn) {
+            const icon = toggleViewBtn.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-compress';
+        }
+    }
+
+    function toggleLayout() {
+        if (!appContainer) return;
+        if (appContainer.classList.contains('simple-mode')) {
+            showAllSections();
+        } else {
+            appContainer.classList.remove('expanded-mode', 'show-left-only', 'show-right-only', 'show-full-all');
+            appContainer.classList.add('simple-mode');
+            sections.forEach(sec => {
+                sec.classList.remove('section-hidden');
+            });
+            if (viewBadgeText) viewBadgeText.textContent = 'الوضع الكامل';
+            if (toggleViewBtn) {
+                const icon = toggleViewBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-expand';
+            }
+        }
+    }
+
+    if (toggleViewBtn) {
+        toggleViewBtn.addEventListener('click', toggleLayout);
+    }
+    
     // API modal elements
     const toggleApiSettings = document.getElementById('toggle-api-settings');
     const apiSettingsPanel = document.getElementById('api-settings-panel');
@@ -537,70 +912,118 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ================= 5. VOICE RECOGNITION (WEB SPEECH API) =================
-    let recognition = null;
+    let recognitionInstance = null;
     let isRecording = false;
 
-    // Check browser compatibility for Web Speech API
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'ar-EG'; // Set to Egyptian Arabic / Standard Arabic
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
 
-        recognition.onstart = () => {
-            isRecording = true;
-            micBtn.classList.add('active-recording');
-            chatInput.placeholder = "جاري الاستماع... تحدث الآن بصوتك 🎤";
-        };
-
-        recognition.onend = () => {
-            isRecording = false;
-            micBtn.classList.remove('active-recording');
-            chatInput.placeholder = "اضغط على المايك وتحدث أو اكتب سؤالك هنا...";
-        };
-
-        recognition.onresult = (event) => {
-            const speechText = event.results[0][0].transcript;
-            if (speechText) {
-                chatInput.value = speechText;
-                showToast(`تم التعرف على: "${speechText}"`);
-                
-                // Auto-send voice queries
-                setTimeout(() => {
-                    sendBtn.click();
-                }, 600);
-            }
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Speech recognition error:", event.error);
-            if (event.error === 'not-allowed') {
-                showToast("عذراً، يجب عليك إعطاء صلاحية الميكروفون للموقع.");
-            } else {
-                showToast("حدث خطأ أثناء الاستماع، جرب التحدث مجدداً.");
-            }
-            isRecording = false;
-            micBtn.classList.remove('active-recording');
-        };
-
-        // Microphone Click Toggle
-        micBtn.addEventListener('click', () => {
-            if (isRecording) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        });
-    } else {
-        // Fallback if not supported (Safari/older browsers)
-        micBtn.style.opacity = '0.5';
-        micBtn.title = "الميكروفون غير مدعوم في هذا المتصفح";
-        micBtn.addEventListener('click', () => {
+    micBtn.addEventListener('click', () => {
+        if (!SpeechRecognition) {
             showToast("عذراً، متصفحك الحالي لا يدعم خاصية التسجيل الصوتي. يرجى الكتابة.");
-        });
-    }
+            return;
+        }
 
+        if (isRecording && recognitionInstance) {
+            try {
+                recognitionInstance.stop();
+            } catch(e) {}
+            return;
+        }
+
+        try {
+            // Create a fresh SpeechRecognition instance on each start
+            recognitionInstance = new SpeechRecognition();
+            recognitionInstance.lang = 'ar-EG';
+            recognitionInstance.continuous = true;
+            recognitionInstance.interimResults = true;
+            recognitionInstance.maxAlternatives = 1;
+
+            let finalTranscript = '';
+
+            recognitionInstance.onstart = () => {
+                isRecording = true;
+                micBtn.classList.add('active-recording');
+                chatInput.placeholder = "جاري الاستماع... تحدث الآن بصوتك 🎤";
+                showToast("جاري الاستماع... تحدث الآن بصوتك 🎤");
+            };
+
+            let silenceTimer = null;
+
+            recognitionInstance.onresult = (event) => {
+                let currentText = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        currentText += event.results[i][0].transcript;
+                    }
+                }
+                const fullText = finalTranscript || currentText;
+                if (fullText) {
+                    chatInput.value = fullText;
+                    chatInput.style.height = 'auto';
+                    chatInput.style.height = (chatInput.scrollHeight - 10) + 'px';
+                }
+
+                // Automatically stop recording after 1.2s of silence when user stops talking
+                if (silenceTimer) clearTimeout(silenceTimer);
+                silenceTimer = setTimeout(() => {
+                    if (isRecording && recognitionInstance) {
+                        try {
+                            recognitionInstance.stop();
+                        } catch(e) {}
+                    }
+                }, 1200);
+            };
+
+            recognitionInstance.onend = () => {
+                if (silenceTimer) clearTimeout(silenceTimer);
+                isRecording = false;
+                micBtn.classList.remove('active-recording');
+                chatInput.placeholder = "اضغط على المايك وتحدث أو اكتب سؤالك هنا...";
+                
+                // Auto submit captured text immediately
+                const textToSend = chatInput.value.trim();
+                if (textToSend) {
+                    setTimeout(() => {
+                        sendBtn.click();
+                    }, 300);
+                }
+            };
+
+            recognitionInstance.onerror = (event) => {
+                console.warn("Speech recognition error:", event.error);
+                isRecording = false;
+                micBtn.classList.remove('active-recording');
+                chatInput.placeholder = "اضغط على المايك وتحدث أو اكتب سؤالك هنا...";
+
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    showToast("يرجى السماح للمتصفح باستخدام الميكروفون (Allow Microphone) 🎤");
+                }
+            };
+
+            recognitionInstance.start();
+        } catch (err) {
+            console.error("Speech recognition start failed:", err);
+            isRecording = false;
+            micBtn.classList.remove('active-recording');
+        }
+    });
+
+
+    function primeAudioPlayer() {
+        if (!isSoundEnabled) return;
+        const audioPlayer = document.getElementById('tutor-audio-player');
+        if (audioPlayer) {
+            audioPlayer.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+            audioPlayer.play().catch(() => {});
+        }
+        if ('speechSynthesis' in window) {
+            try {
+                window.speechSynthesis.resume();
+            } catch(e){}
+        }
+    }
 
     // ================= 6. CHAT CONSOLE LOGIC =================
     sendBtn.addEventListener('click', () => {
@@ -642,6 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function handleUserMessage(message) {
+        primeAudioPlayer(); // Synchronously prime audio gesture before async delay!
         appendMessage('student', message);
         const loadingId = appendLoadingBubble();
 
@@ -650,6 +1074,9 @@ document.addEventListener('DOMContentLoaded', () => {
             removeLoadingBubble(loadingId);
             appendMessage('tutor', response.text);
             
+            // Speak response vocally out loud
+            speakText(response.text);
+
             if (response.nav) {
                 executeNavigationCommand(response.nav);
             }
@@ -720,13 +1147,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const sectionId = parts[0];
         const detailKey = parts[1] || null;
 
+        expandSelectiveSection(sectionId);
+
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
             let guidanceMsg = "يوجهك مستر شريف إلى لوحة الشرح المناسبة...";
             
             if (sectionId === 'cell-section') {
                 guidanceMsg = "يوجهك مستر شريف إلى مجسم الخلية الحية! 🧬";
-                if (detailKey) activateSunSpot(detailKey);
+                const spotToActivate = detailKey || 'nucleus';
+                activateSunSpot(spotToActivate);
             } else if (sectionId === 'elements-section') {
                 if (detailKey) {
                     const arabicName = chemicalData[detailKey] ? chemicalData[detailKey].name.split(' ')[1] : detailKey;

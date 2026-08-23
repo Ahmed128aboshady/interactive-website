@@ -134,6 +134,74 @@ body {
     width: 100vw;
     position: relative;
     overflow: hidden;
+    transition: grid-template-columns 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Simple Mode (Centered Single Column Initially) */
+.hologram-app-container.simple-mode {
+    grid-template-columns: 0fr 850px 0fr;
+    justify-content: center;
+}
+
+.hologram-app-container.simple-mode .left-column,
+.hologram-app-container.simple-mode .right-column {
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    pointer-events: none;
+    transform: scale(0.92);
+    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+}
+
+/* Selective Column Modes */
+/* Show Left Column Only (Biology / Chemistry) */
+.hologram-app-container.show-left-only {
+    grid-template-columns: 1.25fr 1.3fr 0fr;
+}
+.hologram-app-container.show-left-only .left-column {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1);
+}
+.hologram-app-container.show-left-only .right-column {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.92);
+}
+
+/* Show Right Column Only (Physics / Quiz) */
+.hologram-app-container.show-right-only {
+    grid-template-columns: 0fr 1.3fr 1.25fr;
+}
+.hologram-app-container.show-right-only .right-column {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1);
+}
+.hologram-app-container.show-right-only .left-column {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.92);
+}
+
+/* Show Full 3 Columns Mode */
+.hologram-app-container.show-full-all {
+    grid-template-columns: 1.15fr 1.3fr 1.15fr;
+}
+.hologram-app-container.show-full-all .left-column,
+.hologram-app-container.show-full-all .right-column {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+.edu-section.section-hidden {
+    display: none !important;
 }
 
 .hologram-column {
@@ -148,6 +216,10 @@ body {
     border-left: 1px solid rgba(0, 255, 210, 0.05);
     border-right: 1px solid rgba(0, 255, 210, 0.05);
     backdrop-filter: blur(10px);
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s, visibility 0.5s ease;
 }
 
 .column-scroll-content {
@@ -745,20 +817,24 @@ body {
    ================= CENTER COLUMN (TEACHER CONSOLE) =================
    ================= ================= ================= */
 .center-column {
-    padding: 20px 30px;
+    padding: 15px 30px 20px 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background: radial-gradient(circle at 50% 70%, rgba(0, 255, 210, 0.08) 0%, transparent 60%);
     position: relative;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .center-app-header {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(0, 255, 210, 0.08);
-    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 255, 210, 0.12);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .cosmo-logo {
@@ -784,6 +860,84 @@ body {
     letter-spacing: 0.5px;
     display: block;
     margin-top: -3px;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sound-toggle-badge {
+    background: rgba(0, 255, 210, 0.05);
+    border: 1px solid rgba(0, 255, 210, 0.2);
+    color: var(--neon-teal);
+    border-radius: 30px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.sound-toggle-badge:hover {
+    background: rgba(0, 255, 210, 0.12);
+    box-shadow: 0 0 10px var(--neon-teal-glow);
+}
+
+.sound-toggle-badge.muted-mode {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.view-toggle-badge {
+    background: rgba(0, 255, 210, 0.05);
+    border: 1px solid rgba(0, 255, 210, 0.2);
+    color: var(--neon-teal);
+    border-radius: 30px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.view-toggle-badge:hover {
+    background: rgba(0, 255, 210, 0.12);
+    box-shadow: 0 0 10px var(--neon-teal-glow);
+}
+
+/* Robot Character Speaking Animations */
+.astrotutor-character.is-speaking {
+    animation: speaking-hover 0.8s ease-in-out infinite alternate !important;
+}
+
+@keyframes speaking-hover {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(-8px) scale(1.03); }
+}
+
+.astrotutor-character.is-speaking .robot-mouth {
+    background: var(--neon-teal) !important;
+    box-shadow: 0 0 12px var(--neon-teal) !important;
+    animation: mouth-talk 0.2s infinite alternate !important;
+}
+
+@keyframes mouth-talk {
+    0% { height: 4px; border-radius: 2px; }
+    100% { height: 12px; border-radius: 6px; }
+}
+
+.astrotutor-character.is-speaking .holo-light {
+    opacity: 1 !important;
+    filter: blur(1px) !important;
 }
 
 .api-toggle-badge {
@@ -1299,43 +1453,54 @@ body {
 }
 
 .prompt-chip {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
-    color: var(--text-muted);
+    background: rgba(0, 255, 210, 0.06);
+    border: 1px solid rgba(0, 255, 210, 0.22);
+    color: #e2e8f0;
+    font-weight: 600;
     border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 0.72rem;
+    padding: 6px 14px;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: var(--transition-smooth);
 }
 
 .prompt-chip:hover {
-    color: var(--text-heading);
-    background: rgba(0, 255, 210, 0.04);
-    border-color: rgba(0, 255, 210, 0.2);
+    color: #ffffff;
+    background: rgba(0, 255, 210, 0.15);
+    border-color: var(--neon-teal);
+    box-shadow: 0 0 10px var(--neon-teal-glow);
     transform: translateY(-1px);
 }
 
 /* Center Input Console */
 .center-input-console {
-    padding: 12px 18px;
-    background: rgba(2, 4, 12, 0.75);
-    border-color: rgba(0, 255, 210, 0.2);
+    padding: 10px 18px;
+    background: rgba(6, 15, 35, 0.95);
+    border: 1.5px solid rgba(0, 255, 210, 0.35);
+    border-radius: 30px;
     display: flex;
     align-items: center;
     gap: 12px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 210, 0.15);
 }
 
 .center-input-console textarea {
     flex-grow: 1;
     background: transparent;
     border: none;
-    color: #fff;
-    font-size: 0.9rem;
+    color: #ffffff !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
     resize: none;
-    max-height: 70px;
-    line-height: 1.45;
+    max-height: 75px;
+    line-height: 1.5;
+}
+
+.center-input-console textarea::placeholder {
+    color: #94a3b8 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
 }
 
 .center-input-console textarea:focus {
@@ -1525,6 +1690,91 @@ body {
 }
 .toast-icon { color: var(--neon-green); }
 .toast-message { font-size: 0.8rem; color: #fff; }
+
+/* Modal Overlay Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: rgba(8, 18, 41, 0.95);
+    border: 1px solid var(--neon-teal);
+    box-shadow: 0 0 35px rgba(0, 255, 210, 0.2);
+    border-radius: 16px;
+    width: 480px;
+    max-width: 90%;
+    padding: 24px;
+    color: #fff;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 210, 0.15);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.modal-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.close-modal-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.close-modal-btn:hover {
+    color: #ff4d4d;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #e2e8f0;
+}
+
+.modal-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 210, 0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.modal-input:focus {
+    border-color: var(--neon-teal);
+    box-shadow: 0 0 10px var(--neon-teal-glow);
+}
+
+.input-hint {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
 
 
 /* ================= KEYFRAMES & TRANSITIONS ================= */
