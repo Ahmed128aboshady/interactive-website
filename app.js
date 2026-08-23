@@ -516,11 +516,17 @@ document.addEventListener('DOMContentLoaded', () => {
     hotspots.forEach(spot => {
         spot.addEventListener('click', () => {
             const spotKey = spot.getAttribute('data-spot');
-            activateSunSpot(spotKey);
+            activateSunSpot(spotKey, true);
         });
     });
 
-    function activateSunSpot(spotKey) {
+    const spotVoiceTexts = {
+        nucleus: 'رقم 1 النواة: هي مخ الخلية ومركز التحكم، وجواها الحمض النووي DNA!',
+        mitochondria: 'رقم 2 الميتوكوندريا: دي مصنع الطاقة الحقيقي اللي بيولد مركبات ATP!',
+        cytoplasm: 'رقم 3 السيتوبلازم: السائل الهلامي الحيوي اللي بتسبح فيه كل العضيات!'
+    };
+
+    function activateSunSpot(spotKey, speakOutLoud = false) {
         hotspots.forEach(s => s.classList.remove('active-spot'));
         const activeSpot = document.querySelector(`.hotspot[data-spot="${spotKey}"]`);
         if (activeSpot) activeSpot.classList.add('active-spot');
@@ -538,6 +544,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 sunSpotContent.style.opacity = 1;
                 sunSpotContent.style.transition = 'opacity 0.3s ease';
             }, 100);
+
+            if (speakOutLoud && spotVoiceTexts[spotKey]) {
+                speakText(spotVoiceTexts[spotKey]);
+            }
         }
     }
 
@@ -614,14 +624,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const elementVoiceTexts = {
+        hydrogen: 'عنصر الهيدروجين: أبسط وأخف عناصر الكون وعدده الذري 1!',
+        oxygen: 'عنصر الأكسجين: غاز التنفس والحياة الأساسي وعدده الذري 8!',
+        carbon: 'عنصر الكربون: أساس الكيمياء العضوية وكل الكائنات وعدده الذري 6!',
+        iron: 'عنصر الحديد: معدن القوة والصلابة وهيموجلوبين الدم وعدده الذري 26!'
+    };
+
     planetCards.forEach(card => {
         card.addEventListener('click', () => {
             const planetKey = card.getAttribute('data-planet');
-            activatePlanet(planetKey);
+            activatePlanet(planetKey, true);
         });
     });
 
-    function activatePlanet(planetKey) {
+    function activatePlanet(planetKey, speakOutLoud = false) {
         planetCards.forEach(c => c.classList.remove('active-card'));
         const activeCard = document.querySelector(`.planet-card-mini[data-planet="${planetKey}"]`);
         if (activeCard) activeCard.classList.add('active-card');
@@ -644,6 +661,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.textContent = fact;
                 planetFactsList.appendChild(li);
             });
+
+            if (speakOutLoud && elementVoiceTexts[planetKey]) {
+                speakText(elementVoiceTexts[planetKey]);
+            }
         }
     }
 
@@ -776,14 +797,20 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animateParticles);
     }
 
+    const stateVoiceTexts = {
+        solid: 'الحالة الصلبة: الجزيئات متراصة جداً وبتتحرك حركة اهتزازية بس في مكانها!',
+        liquid: 'الحالة السائلة: الجزيئات بتنزلق فوق بعضها وبتاخد شكل الوعاء!',
+        gas: 'الحالة الغازية: الجزيئات حرة وسريعة جداً وبتملأ أي مساحة متاحة!'
+    };
+
     stateButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const stateKey = btn.getAttribute('data-state');
-            activateState(stateKey);
+            activateState(stateKey, true);
         });
     });
 
-    function activateState(stateKey) {
+    function activateState(stateKey, speakOutLoud = false) {
         stateButtons.forEach(b => b.classList.remove('active-state'));
         const activeBtn = document.querySelector(`.state-btn[data-state="${stateKey}"]`);
         if (activeBtn) activeBtn.classList.add('active-state');
@@ -796,6 +823,10 @@ document.addEventListener('DOMContentLoaded', () => {
             stateTitle.textContent = data.title;
             stateDesc.textContent = data.desc;
             stateEnergyTag.textContent = data.energy;
+
+            if (speakOutLoud && stateVoiceTexts[stateKey]) {
+                speakText(stateVoiceTexts[stateKey]);
+            }
         }
     }
 
@@ -886,9 +917,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (answerIdx === currentQ.correctIndex) {
             selectedBtn.classList.add('correct');
             userScore++;
+            speakText('الله ينور عليك يا بطل! إجابة صحيحة وممتازة!');
         } else {
             selectedBtn.classList.add('incorrect');
             answerButtons[currentQ.correctIndex].classList.add('correct');
+            speakText('معلش يا بطل، ركز في السؤال اللي جاي وهتعوضها!');
         }
 
         setTimeout(() => {
@@ -911,12 +944,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userScore === quizQuestions.length) {
             resultTitle.textContent = "عبقري العلوم الصغير! 🏆";
             resultText.textContent = `ممتاز يا بطل! لقد حصلت على الدرجة النهائية ${userScore}/${quizQuestions.length} بنسبة 100%!`;
+            speakText('عاش يا بطل! درجتك كاملة 3 من 3!');
         } else if (userScore > 0) {
             resultTitle.textContent = "مستكشف علمي رائع! 💫";
             resultText.textContent = `عمل جيد! حصلت على نتيجة ${userScore} من ${quizQuestions.length}. كرر المحاولة للوصول للدرجة النهائية!`;
+            speakText(`أحسنت يا بطل! درجتك ${userScore} من 3.`);
         } else {
             resultTitle.textContent = "حاول مجدداً يا بطل! 🔬";
             resultText.textContent = `لم تجب على أي سؤال. اسأل مستر شريف عن الدروس وسيعلمك كل شيء مجدداً!`;
+            speakText('راجع المجسمات وجرب الكويز تاني يا بطل!');
         }
     }
 
