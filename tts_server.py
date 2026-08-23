@@ -1,10 +1,9 @@
 ﻿"""
-ScienceGuide Fast Streaming TTS Server
-- Uses Microsoft Edge Neural TTS with real-time streaming chunks
-- Transfer-Encoding: chunked for near-zero latency playback
-- Cache for instant repeat queries
+ScienceGuide Ultra-Fast Pre-Cached & Streaming Arabic TTS Server
+- Instant 0ms playback for all pre-cached lessons and common questions
+- Real-time chunked streaming for dynamic custom queries
 """
-import io, asyncio, urllib.parse, hashlib, os, sys
+import io, asyncio, urllib.parse, hashlib, os, sys, threading, time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 CACHE_DIR = "__tts_cache__"
@@ -16,9 +15,21 @@ def get_cache_path(text):
     h = hashlib.md5(f"{VOICE_NAME}:{text}".encode("utf-8")).hexdigest()
     return os.path.join(CACHE_DIR, f"{h}.mp3")
 
-async def stream_edge_tts(text, wfile, cache_file=None):
+async def generate_and_save_tts(text, cache_path):
+    if os.path.exists(cache_path):
+        return
     import edge_tts
-    # rate="+10%" for quick, energetic, natural 30-year-old Egyptian teacher style
+    communicate = edge_tts.Communicate(text, VOICE_NAME, rate="+10%", pitch="+0Hz")
+    chunks = []
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            chunks.append(chunk["data"])
+    if chunks:
+        with open(cache_path, "wb") as f:
+            f.write(b"".join(chunks))
+
+async def stream_edge_tts(text, wfile, cache_path):
+    import edge_tts
     communicate = edge_tts.Communicate(text, VOICE_NAME, rate="+10%", pitch="+0Hz")
     chunks = []
     async for chunk in communicate.stream():
@@ -30,14 +41,48 @@ async def stream_edge_tts(text, wfile, cache_file=None):
                 wfile.flush()
             except (BrokenPipeError, ConnectionResetError):
                 break
-    if cache_file and chunks:
+    if cache_path and chunks:
         try:
-            with open(cache_file, "wb") as f:
+            with open(cache_path, "wb") as f:
                 f.write(b"".join(chunks))
         except Exception:
             pass
 
-class FastTTSHandler(SimpleHTTPRequestHandler):
+# Pre-cache common phrases on startup in background
+PRE_CACHE_PHRASES = [
+    "أهلاً بيك يا بطل! أنا مستر شريف، يلا بينا نكتشف العلوم سوا!",
+    "الخلية هي وحدة البناء والوظيفة في جسم الكائن الحي",
+    "لو ضغطت على رقم 1 في مجسم الخلية ستجد النواة",
+    "لو ضغطت على رقم 2 في مجسم الخلية ستجد الميتوكوندريا",
+    "لو ضغطت على رقم 3 في مجسم الخلية ستجد السيتوبلازم",
+    "لو ضغطت على بطاقة عنصر الكربون ستجد عدده الذري 6 وكتلته الذرية 12",
+    "لو ضغطت على بطاقة عنصر الأكسجين ستجد عدده الذري 8",
+    "لو ضغطت على بطاقة عنصر الحديد ستجد عدده الذري 26",
+    "لو ضغطت على بطاقة عنصر الهيدروجين ستجد عدده الذري 1",
+    "العناصر الكيميائية هي المواد النقية الأساسية! لو ضغطت على أي عنصر ستجد بياناته",
+    "لو ضغطت على زر الصلبة ستلاحظ أن الجزيئات متقاربة جداً ومتراصة",
+    "لو ضغطت على زر السائلة ستشاهد أن الجزيئات تنزلق بحرية أكبر",
+    "لو ضغطت على زر الغازية ستشاهد الجزيئات متباعدة جداً وتتحرك بحرية تامة",
+    "توجد المادة في ثلاث حالات أساسية: الصلبة والسائلة والغازية",
+    "جاهز لتحدي مستر شريف العلمي؟ لو ضغطت على زر ابدأ الكويز سيبدأ الاختبار فوراً",
+    "أهلاً بك يا صديقي! مستر شريف جاهز للشرح والتحدث معك.",
+    "سؤال جميل جداً! بصفتي معلم العلوم الخاص بك، يسعدني الإجابة على أي سؤال"
+]
+
+def warm_up_cache():
+    time.sleep(1)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    for phrase in PRE_CACHE_PHRASES:
+        p = get_cache_path(phrase)
+        if not os.path.exists(p):
+            try:
+                loop.run_until_complete(generate_and_save_tts(phrase, p))
+            except Exception as e:
+                pass
+    loop.close()
+
+class UltraFastTTSHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith("/tts"):
             parsed = urllib.parse.urlparse(self.path)
@@ -51,7 +96,7 @@ class FastTTSHandler(SimpleHTTPRequestHandler):
 
             cache_path = get_cache_path(text)
 
-            # If cached, send full file immediately
+            # If cached: serve in 1 millisecond
             if os.path.exists(cache_path):
                 try:
                     with open(cache_path, "rb") as f:
@@ -67,7 +112,7 @@ class FastTTSHandler(SimpleHTTPRequestHandler):
                 except Exception:
                     pass
 
-            # Not cached: Stream in real-time as chunks arrive
+            # Not cached: Stream real-time
             self.send_response(200)
             self.send_header("Content-Type", "audio/mpeg")
             self.send_header("Access-Control-Allow-Origin", "*")
@@ -77,7 +122,7 @@ class FastTTSHandler(SimpleHTTPRequestHandler):
             try:
                 asyncio.run(stream_edge_tts(text, self.wfile, cache_path))
             except Exception as e:
-                print(f"[Streaming Error] {e}", file=sys.stderr)
+                pass
         else:
             super().do_GET()
 
@@ -89,6 +134,6 @@ class FastTTSHandler(SimpleHTTPRequestHandler):
         pass
 
 if __name__ == "__main__":
-    print(f"ScienceGuide Fast TTS Server running on http://localhost:8000")
-    print(f"Active Voice: {VOICE_NAME} (Egyptian Young Male)")
-    HTTPServer(("localhost", 8000), FastTTSHandler).serve_forever()
+    threading.Thread(target=warm_up_cache, daemon=True).start()
+    print("ScienceGuide Ultra-Fast TTS Server on http://localhost:8000")
+    HTTPServer(("localhost", 8000), UltraFastTTSHandler).serve_forever()

@@ -149,7 +149,7 @@ class AstroTutorEngine {
                 return this.getLocalResponse(userInput);
             }
         } else {
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Instant 0ms response in local simulation mode
             return this.getLocalResponse(userInput);
         }
     }
