@@ -247,48 +247,54 @@ document.addEventListener('DOMContentLoaded', () => {
                null;
     }
 
-    // Test voice button — tests local gTTS server
+    // Test voice button — tests local fast streaming server
     const testVoiceBtn = document.getElementById('test-voice-btn');
     if (testVoiceBtn) {
         testVoiceBtn.addEventListener('click', () => {
-            const testText = 'مرحباً أنا مستر شريف معلم العلوم التفاعلي';
+            const testText = 'أهلاً بيك يا بطل! أنا مستر شريف، يلا بينا نكتشف العلوم سوا!';
             const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(testText)}`;
-            showToast('🔊 جاري تشغيل الصوت العربي...');
+            showToast('🔊 مستر شريف بيتكلم معاك...');
             const audio = new Audio(ttsUrl);
-            audio.oncanplay = () => {
-                audio.play();
-                showToast('✅ الصوت العربي يعمل بنجاح!');
-            };
-            audio.onerror = () => {
-                showToast('❌ تأكد إن السيرفر شغال: python tts_server.py');
-            };
+            audio.play().then(() => {
+                showToast('✅ الصوت المصري شغال بسرعة وبدون تأخير!');
+            }).catch(() => {
+                showToast('❌ تأكد إن السيرفر شغال');
+            });
         });
     }
 
     function cleanForSpeech(text) {
-        return text
+        let clean = text
             .replace(/\[NAV:[^\]]+\]/g, '')
             .replace(/\*\*([^*]+)\*\*/g, '$1')
             .replace(/[*_#`~]/g, '')
             .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
             .replace(/\s+/g, ' ')
             .trim();
+
+        // Take the first 2 concise sentences or max 130 characters for instant speech
+        const sentences = clean.split(/[.!؟\n]+/);
+        if (sentences.length > 1 && sentences[0].length >= 25) {
+            clean = sentences.slice(0, 2).join('! ').trim();
+        }
+        return clean.substring(0, 130).trim();
     }
 
     function speakText(text) {
         if (!isSoundEnabled) return;
 
         const robotChar = document.querySelector('.astrotutor-character');
-        const cleanText = cleanForSpeech(text).substring(0, 300);
+        const cleanText = cleanForSpeech(text);
         if (!cleanText) return;
 
-        // Use local gTTS server for real Arabic speech
+        // Use local fast streaming TTS server
         const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(cleanText)}`;
         const audioPlayer = document.getElementById('tutor-audio-player');
 
         if (robotChar) robotChar.classList.add('is-speaking');
 
         if (audioPlayer) {
+            audioPlayer.pause();
             audioPlayer.src = ttsUrl;
             audioPlayer.onended = audioPlayer.onerror = () => {
                 if (robotChar) robotChar.classList.remove('is-speaking');
@@ -297,7 +303,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (robotChar) robotChar.classList.remove('is-speaking');
             });
         } else {
+            if (currentAudioObject) {
+                try { currentAudioObject.pause(); } catch(e) {}
+            }
             const audio = new Audio(ttsUrl);
+            currentAudioObject = audio;
             audio.onended = audio.onerror = () => {
                 if (robotChar) robotChar.classList.remove('is-speaking');
             };
@@ -411,11 +421,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Setup stored API Key
     if (aiEngine.isApiKeyActive()) {
-        geminiKeyInput.value = aiEngine.apiKey;
-        statusDot.className = 'status-dot active';
-        statusText.textContent = 'مفتاح API نشط';
-        toggleApiSettings.classList.add('active-mode');
-        apiBadgeText.textContent = 'الذكاء الاصطناعي نشط';
+        if (geminiKeyInput) geminiKeyInput.value = aiEngine.apiKey;
+        if (statusDot) statusDot.className = 'status-dot active';
+        if (statusText) statusText.textContent = 'مفتاح API نشط';
+        if (toggleApiSettings) toggleApiSettings.classList.add('active-mode');
+        if (apiBadgeText) apiBadgeText.textContent = 'الذكاء الاصطناعي نشط';
     }
 
     // Modal triggers
