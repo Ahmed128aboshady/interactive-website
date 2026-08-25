@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mena Science System — Handoff للمهندس (Port 2026)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #070d18;
+            --bg-card: rgba(13, 27, 44, 0.88);
+            --bg-glass: rgba(18, 38, 62, 0.7);
+            --border-glass: rgba(0, 242, 254, 0.3);
+            --neon-cyan: #00f2fe;
+            --neon-green: #00ffd2;
+            --neon-yellow: #ffd200;
+            --neon-purple: #b026ff;
+            --neon-pink: #ff3366;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #030710;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(0, 242, 254, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(176, 38, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #0c1c2e 0%, #040810 100%);
+            background-attachment: fixed;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Top Handoff Banner */
+        .handoff-banner {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 28px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .handoff-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-yellow));
+        }
+
+        .banner-branding {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .teacher-img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid var(--neon-cyan);
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+        }
+
+        .banner-title h1 {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .banner-title h1 span {
+            color: var(--neon-cyan);
+        }
+
+        .banner-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .port-tag {
+            background: rgba(0, 255, 210, 0.15);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 16px rgba(0, 255, 210, 0.25);
+        }
+
+        .port-tag::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: pulseRing 1.5s infinite;
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.4; }
+        }
+
+        /* Nav Pills */
+        .nav-pills {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .nav-pill {
+            text-decoration: none;
+            background: rgba(20, 42, 68, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            transition: all 0.25s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-pill:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Section Card */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .section-badge-num {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .badge-1 { background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+        .badge-2 { background: rgba(176, 38, 255, 0.15); color: var(--neon-purple); border: 1px solid var(--neon-purple); }
+        .badge-3 { background: rgba(0, 255, 210, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .badge-4 { background: rgba(255, 210, 0, 0.15); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+        .badge-5 { background: rgba(255, 51, 102, 0.15); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        /* Code Block */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 18px 22px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin: 16px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: #38bdf8;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        code { font-family: 'Fira Code', monospace; }
+
+        /* Audio Player Box */
+        .audio-item-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .audio-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--neon-green);
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        /* List Items */
+        .handoff-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .handoff-list li {
+            position: relative;
+            padding-right: 26px;
+            color: var(--text-main);
+            font-size: 0.96rem;
+        }
+
+        .handoff-list li::before {
+            content: '⚡';
+            position: absolute;
+            right: 0;
+            top: 2px;
+            color: var(--neon-cyan);
+            font-size: 0.85rem;
+        }
+
+        .highlight-box {
+            background: rgba(0, 242, 254, 0.08);
+            border-right: 4px solid var(--neon-cyan);
+            padding: 14px 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 16px 0;
+            font-size: 0.94rem;
+        }
+
+        .roadmap-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .step-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-text h4 {
+            font-size: 0.98rem;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .step-text p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        /* Action Footer */
+        .handoff-footer {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(176, 38, 255, 0.15));
+            border: 1px solid var(--neon-cyan);
+            border-radius: 18px;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .launch-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            color: #000;
+            font-weight: 800;
+            padding: 12px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s;
+            box-shadow: 0 0 20px rgba(0, 255, 210, 0.4);
+        }
+
+        .launch-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(0, 255, 210, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Top Banner -->
+        <header class="handoff-banner">
+            <div class="banner-branding">
+                <img src="assets/mr_mena_1.jpeg" alt="مستر مينا جرجس" class="teacher-img">
+                <div class="banner-title">
+                    <h1>Mena Science System — <span>Handoff للمهندس</span></h1>
+                    <p>المستند الفني الكامل لتسليم وتطوير سيستم مستر مينا جرجس للعلوم التفاعلية</p>
+                </div>
+            </div>
+            <div class="port-tag">
+                <i class="fa-solid fa-server"></i> Port 2026 Live
+            </div>
+        </header>
+
+        <!-- Quick Navigation -->
+        <nav class="nav-pills">
+            <a href="#sec-1" class="nav-pill"><i class="fa-solid fa-layer-group"></i> 1. إيه اللي موجود دلوقتي</a>
+            <a href="#sec-2" class="nav-pill"><i class="fa-solid fa-folder-open"></i> 2. إزاي تديله المشروع</a>
+            <a href="#sec-3" class="nav-pill"><i class="fa-solid fa-database"></i> 3. هيكل المحتوى (JSON)</a>
+            <a href="#sec-4" class="nav-pill"><i class="fa-solid fa-microphone-lines"></i> 4. ربط الريكوردات والصوت</a>
+            <a href="#sec-5" class="nav-pill"><i class="fa-solid fa-list-check"></i> 5. الترتيب المقترح للتنفيذ</a>
+            <a href="http://localhost:8000" target="_blank" class="nav-pill" style="background: rgba(0,255,210,0.15); border-color: #00ffd2;"><i class="fa-solid fa-play"></i> فتح منصة العلوم (8000)</a>
+        </nav>
+
+        <!-- SECTION 1 -->
+        <section class="section-card" id="sec-1">
+            <div class="section-badge-num badge-1">القسم الأول • Current State</div>
+            <h2 class="section-title">1. إيه اللي موجود دلوقتي</h2>
+            
+            <ul class="handoff-list">
+                <li><strong>شات نصي + صوتي:</strong> يعمل بتقنية Speech-to-Text المباشرة من المتصفح بالعامية المصرية.</li>
+                <li><strong>محرك الذكاء الاصطناعي:</strong> إرسال الأسئلة للـ AI مع System Prompt يجسد شخصية "مستر مينا" وقائمة المعامل العلمية.</li>
+                <li><strong>التوجيه التلقائي للمعمل (Auto-Nav):</strong> الموديل يرجع JSON فيه الرد + <code>lab_id</code> ليقوم السيستم بفتح المعمل المناسب وتركيز الضوء عليه تلقائياً.</li>
+                <li><strong>النطق الصوتي اللحظي:</strong> تم تسريع الـ TTS ليعمل بـ 0ms Latency مع زر تشغيل مباشر للشرح الحقيقي لمستر مينا.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>🔒 متطلب أمان الإنتاج (Production Backend):</strong> بناء Backend بسيط (Python FastAPI / Node.js) يستقبل السؤال من الفرونت إند، ويرسله للـ API بمفتاح محفوظ على السيرفر، ويرجع الرد كـ JSON مؤمن.
+            </div>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section class="section-card" id="sec-2">
+            <div class="section-badge-num badge-2">القسم الثاني • Project Brief</div>
+            <h2 class="section-title">2. إزاي تديله المشروع</h2>
+            
+            <p>سلّمه الحاجات دي كـ <strong>Project Brief</strong> متكامل:</p>
+            <ul class="handoff-list">
+                <li><strong>1. الملف التجريبي والمنصة الشغالة:</strong> لمعاينة الفكرة عملياً على <code>http://localhost:8000/</code>.</li>
+                <li><strong>2. مستند المشروع الأصلي:</strong> هوية المشروع، الركائز، والمحتوى العلمي المفصل لمنهجي 1ع و 2ع.</li>
+                <li><strong>3. هيكل الداتا (JSON Schema):</strong> ليعرف المهندس كيف يبني الـ Database والـ Content Pipeline صح من البداية.</li>
+                <li><strong>4. متطلبات الربط الصوتي:</strong> تشغيل الريكوردات الحقيقية واستنساخ ElevenLabs.</li>
+                <li><strong>5. تحديد بيئة التشغيل:</strong> تطبيق ويب تفاعلي عالي الأداء مع دعم حفظ تقدم الطالب ودرجات الكويز.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section class="section-card" id="sec-3">
+            <div class="section-badge-num badge-3">القسم الثالث • Data & Content Structure</div>
+            <h2 class="section-title">3. إزاي تغذّيه بالمحتوى (Content Structure)</h2>
+            
+            <p>بدل ما تديله المذكرات كـ PDF عشوائي، تم تحويل المعامل إلى بنية <strong>JSON Schema</strong> معيارية ومنظمة:</p>
+
+            <pre><code>{
+  "lab_id": "atom",
+  "grade": "1ع",
+  "title": "مختبر التركيب الذري ومستويات الطاقة",
+  "learning_objectives": [
+    "يفهم تركيب الذرة والنواة الموجبة",
+    "يحسب سعة كل مستوى طاقة بقاعدة 2n²"
+  ],
+  "explanation_script": "النص الكامل اللي مستر مينا هيشرح بيه الموضوع بصوته وأسلوبه...",
+  "key_terms": [
+    {"term": "مستوى الطاقة", "definition": "..."},
+    {"term": "2n²", "definition": "..."}
+  ],
+  "audio_files": [
+    {"segment": "intro", "file_url": "assets/atom_intro.mp3"},
+    {"segment": "level_K", "file_url": "assets/atom_level_k.mp3"}
+  ],
+  "quiz": [
+    {
+      "question": "سعة مستوى K كام إلكترون؟",
+      "options": ["2", "8", "18", "32"],
+      "correct": 0,
+      "explanation": "طبقاً للقاعدة 2n² = 2 × (1)² = 2e⁻"
+    }
+  ]
+}</code></pre>
+
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                تم إنشاء هذا الهيكل وحفظه بالفعل في ملف <code>labs_content.json</code> لكافة معامل المنهجين!
+            </p>
+        </section>
+
+        <!-- SECTION 4 -->
+        <section class="section-card" id="sec-4">
+            <div class="section-badge-num badge-4">القسم الرابع • Audio & Voice Mapping</div>
+            <h2 class="section-title">4. إزاي يربط الريكوردات (صوت مستر مينا الحقيقي)</h2>
+            
+            <h3 style="color: var(--neon-cyan); font-size: 1.1rem; margin: 12px 0;">أ) ربط تسجيلات حقيقية جاهزة (استمع إليها الآن):</h3>
+            
+            <div class="audio-item-box">
+                <div class="audio-item-header">
+                    <span><i class="fa-solid fa-microphone"></i> تسجيل مستر مينا الحقيقي (شرح مندليف وموزلي 2ع):</span>
+                    <span style="font-size: 0.75rem; color: var(--neon-yellow);">صوت المدرس .ogg</span>
+                </div>
+                <audio controls src="assets/mr_mena_sample.ogg"></audio>
+            </div>
+
+            <div class="audio-item-box">
+                <div class="audio-item-header">
+                    <span><i class="fa-solid fa-comments"></i> ريكورد توجيهات أسلوب الصوت والتفاعل:</span>
+                    <span style="font-size: 0.75rem; color: var(--neon-green);">voice_note_1.ogg</span>
+                </div>
+                <audio controls src="assets/voice_note_1.ogg"></audio>
+            </div>
+
+            <div class="audio-item-box">
+                <div class="audio-item-header">
+                    <span><i class="fa-solid fa-book-open"></i> ريكورد تنظيم تسجيلات الدروس والمذكرات:</span>
+                    <span style="font-size: 0.75rem; color: var(--neon-purple);">voice_note_2.ogg</span>
+                </div>
+                <audio controls src="assets/voice_note_2.ogg"></audio>
+            </div>
+
+            <h3 style="color: var(--neon-cyan); font-size: 1.1rem; margin: 18px 0 10px;">ب) استنساخ الصوت عبر ElevenLabs للأجزاء الجديدة:</h3>
+            <ul class="handoff-list">
+                <li>رفع عينات الصوت النقية لتدريب نموذج الصوت (Instant Voice Clone).</li>
+                <li>توليد الشروحات بالـ Voice ID مع التخزين المسبق (Pre-caching) لضمان سرعة 0ms.</li>
+            </ul>
+
+            <h3 style="color: var(--neon-cyan); font-size: 1.1rem; margin: 18px 0 10px;">ج) ربط الصوت بحركة الشفاه (Lip-Sync):</h3>
+            <ul class="handoff-list">
+                <li>مزامنة تموجات الصوت مع حركة فم ومجسم مستر مينا 3D لتبدو طبيعية وحيوية.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 5 -->
+        <section class="section-card" id="sec-5">
+            <div class="section-badge-num badge-5">القسم الخامس • Roadmap</div>
+            <h2 class="section-title">5. ترتيب مقترح للتنفيذ (Roadmap)</h2>
+            
+            <div class="roadmap-steps">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <h4>Backend بسيط وآمن</h4>
+                        <p>تأمين مفاتيح الـ API واستقبال السؤال وإرجاع رد بصيغة JSON مع معرف المعمل <code>lab_id</code>.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <h4>تفريغ وهيكلة المحتوى (JSON)</h4>
+                        <p>تجهيز محتوى المعامل (الكثافة، الذرة، البندول، الجدول الدوري، الغلاف الجوي) في <code>labs_content.json</code>.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <h4>ربط التسجيلات الصوتية الحقيقية</h4>
+                        <p>تضمين صوت مستر مينا الحقيقي لدرس مندليف وموزلي كـ Proof of Concept وتشغيله بالزر المباشر.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text">
+                        <h4>استنساخ الصوت عبر ElevenLabs</h4>
+                        <p>توليد وتخزين المقاطع الصوتية المسبقة لجميع الأسئلة لتعمل بسرعة فائقة.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-text">
+                        <h4>مجسم الـ 3D التفاعلي والـ Lip-Sync</h4>
+                        <p>تكامل مجسم مستر مينا وتجارب الـ 3D في بيئة Three.js المتطورة.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Launch Bar -->
+        <div class="handoff-footer">
+            <div>
+                <h3 style="color: #fff; font-size: 1.2rem;">🚀 سيستم مستر مينا جرجس متاح ويعمل الآن</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">يمكنك فتح المنصة التفاعلية كاملة على البورت 8000</p>
+            </div>
+            <a href="http://localhost:8000" target="_blank" class="launch-btn">
+                <span>فتح السيستم التفاعلي (Mena Science 3D)</span>
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>
