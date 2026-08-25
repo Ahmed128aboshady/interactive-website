@@ -258,6 +258,9 @@ def build_index_html():
                                         <li>يزداد نشاطها الكيميائي بزيادة الحجم الذري، والأنشط هو السيزيوم (Cs).</li>
                                     </ul>
                                 </div>
+                                <button class="action-btn-compact" id="play-mendeleev-audio-btn" style="margin-top: 10px; background: linear-gradient(135deg, #ffd200, #ff7700); color: #000; font-weight: bold;">
+                                    <i class="fa-solid fa-microphone-lines"></i> استمع لشرح مستر مينا بصوته لدرس مندليف وموزلي 🎙️
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -1135,6 +1138,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    const playMendeleevBtn = document.getElementById('play-mendeleev-audio-btn');
+    if (playMendeleevBtn) {
+        playMendeleevBtn.addEventListener('click', () => {
+            const avatarChar = document.querySelector('.mena-avatar') || document.querySelector('.astrotutor-character');
+            showToast("🎙️ يتم الآن تشغيل التسجيل الصوتي الحقيقي لمستر مينا جرجس...");
+            const audioPlayer = document.getElementById('tutor-audio-player');
+            if (avatarChar) avatarChar.classList.add('is-speaking');
+            if (audioPlayer) {
+                audioPlayer.src = 'assets/mr_mena_sample.ogg';
+                audioPlayer.onended = audioPlayer.onerror = () => {
+                    if (avatarChar) avatarChar.classList.remove('is-speaking');
+                };
+                audioPlayer.play().catch(e => {
+                    if (avatarChar) avatarChar.classList.remove('is-speaking');
+                });
+            }
+        });
+    }
 
     // ================= 2ع: ATMOSPHERE LAYERS LAB =================
     const layerCards = document.querySelectorAll('#g2-atmosphere-section .planet-card-mini');
