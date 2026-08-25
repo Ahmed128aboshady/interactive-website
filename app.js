@@ -1,46 +1,41 @@
 /* -------------------------------------------------------------
-   Main Application Logic for ScienceGuide - Hologram UI Controls
+   Main Application Logic for Mena Science Platform
+   Grade 1 Prep (1ع) & Grade 2 Prep (2ع) Interactive Systems
    ------------------------------------------------------------- */
 
 document.addEventListener('DOMContentLoaded', () => {
     // Instantiate AI Engine
-    const aiEngine = new AstroTutorEngine();
+    const aiEngine = new MrMenaAIEngine();
 
     // DOM Elements
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const chatMessagesContainer = document.getElementById('chat-messages-container');
     const clearChatBtn = document.getElementById('clear-chat-btn');
-    const promptChips = document.querySelectorAll('.prompt-chip');
     const guidanceBanner = document.getElementById('guidance-banner');
     const guidanceText = document.getElementById('guidance-text');
-    
-    // Layout mode elements
     const appContainer = document.querySelector('.hologram-app-container');
     const toggleViewBtn = document.getElementById('toggle-view-mode');
     const viewBadgeText = document.getElementById('view-badge-text');
 
-    // Sound & TTS Speech Control
+    // Grade Switcher Elements
+    const tabGrade1 = document.getElementById('tab-grade-1');
+    const tabGrade2 = document.getElementById('tab-grade-2');
+    const g1Left = document.getElementById('grade1-left-content');
+    const g2Left = document.getElementById('grade2-left-content');
+    const g1Right = document.getElementById('grade1-right-content');
+    const g2Right = document.getElementById('grade2-right-content');
+    const g1Prompts = document.getElementById('g1-prompts');
+    const g2Prompts = document.getElementById('g2-prompts');
+    const leftColTitle = document.getElementById('left-column-title');
+    const rightColTitle = document.getElementById('right-column-title');
+    const welcomeGradeText = document.getElementById('welcome-grade-text');
+
+    // Sound & Speech Control
     const toggleSoundBtn = document.getElementById('toggle-sound');
     const soundBadgeText = document.getElementById('sound-badge-text');
-    let isSoundEnabled = true; // Force enabled by default
-    localStorage.setItem('astrotutor_sound', 'enabled');
-
+    let isSoundEnabled = true;
     let currentAudioObject = null;
-    let audioUnlocked = false;
-
-    // Unlock audio context & speechSynthesis queue on first user interaction
-    function unlockAudioOnGesture() {
-        if (audioUnlocked) return;
-        audioUnlocked = true;
-        if ('speechSynthesis' in window) {
-            try { window.speechSynthesis.resume(); } catch(e){}
-        }
-        document.removeEventListener('click', unlockAudioOnGesture);
-        document.removeEventListener('touchstart', unlockAudioOnGesture);
-    }
-    document.addEventListener('click', unlockAudioOnGesture);
-    document.addEventListener('touchstart', unlockAudioOnGesture);
 
     function updateSoundBadge(triggerTest = false) {
         if (!toggleSoundBtn) return;
@@ -50,14 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (icon) icon.className = 'fa-solid fa-volume-high';
             if (soundBadgeText) soundBadgeText.textContent = 'الصوت مفعل';
             if (triggerTest) {
-                speakText("أهلاً بك يا صديقي! مستر شريف جاهز للشرح والتحدث معك.");
+                speakText("أهلاً بك يا بطل! مستر مينا جرجس جاهز للشرح والتحدث معك.");
             }
         } else {
             toggleSoundBtn.classList.add('muted-mode');
             if (icon) icon.className = 'fa-solid fa-volume-xmark';
             if (soundBadgeText) soundBadgeText.textContent = 'الصوت مكتوم';
-            if (window.responsiveVoice) window.responsiveVoice.cancel();
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             if (currentAudioObject) {
                 currentAudioObject.pause();
                 currentAudioObject = null;
@@ -69,200 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSoundBadge(false);
         toggleSoundBtn.addEventListener('click', () => {
             isSoundEnabled = !isSoundEnabled;
-            localStorage.setItem('astrotutor_sound', isSoundEnabled ? 'enabled' : 'disabled');
-            updateSoundBadge(true); // Speak test phrase on click!
+            updateSoundBadge(true);
         });
     }
 
-    // Pre-load voices on load if supported
-    if ('speechSynthesis' in window) {
-        try {
-            window.speechSynthesis.getVoices();
-            window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.getVoices();
-            };
-        } catch(e){}
-    }
-
-    // ElevenLabs & Settings Modal Control
-    const apiSettingsModal = document.getElementById('api-settings-modal');
-    const toggleApiBtn = document.getElementById('toggle-api-settings');
-    const closeApiModalBtn = document.getElementById('close-api-modal');
-    const saveApiKeysBtn = document.getElementById('save-api-keys-btn');
-    const geminiInput = document.getElementById('gemini-api-key-input');
-    const elevenlabsKeyInput = document.getElementById('elevenlabs-api-key-input');
-    const elevenlabsVoiceInput = document.getElementById('elevenlabs-voice-id-input');
-
-    // API keys are entered by the user via the Settings modal (⚙️ button)
-    // and stored securely in the browser's localStorage - never hardcoded here
-
-    if (geminiInput) geminiInput.value = localStorage.getItem('gemini_api_key') || '';
-    if (elevenlabsKeyInput) elevenlabsKeyInput.value = localStorage.getItem('elevenlabs_api_key') || '';
-    if (elevenlabsVoiceInput) elevenlabsVoiceInput.value = localStorage.getItem('elevenlabs_voice_id') || '21m00Tcm4TlvDq8ikWAM';
-
-    function openSettingsModal() {
-        if (apiSettingsModal) apiSettingsModal.classList.remove('hidden');
-    }
-    function closeSettingsModal() {
-        if (apiSettingsModal) apiSettingsModal.classList.add('hidden');
-    }
-
-    if (toggleApiBtn) toggleApiBtn.addEventListener('click', openSettingsModal);
-    if (closeApiModalBtn) closeApiModalBtn.addEventListener('click', closeSettingsModal);
-
-    if (saveApiKeysBtn) {
-        saveApiKeysBtn.addEventListener('click', () => {
-            if (geminiInput) localStorage.setItem('gemini_api_key', geminiInput.value.trim());
-            if (elevenlabsKeyInput) localStorage.setItem('elevenlabs_api_key', elevenlabsKeyInput.value.trim());
-            if (elevenlabsVoiceInput) localStorage.setItem('elevenlabs_voice_id', elevenlabsVoiceInput.value.trim());
-            
-            showToast('تم حفظ مفاتيح ElevenLabs و Gemini API بنجاح! 🚀');
-            closeSettingsModal();
-        });
-    }
-
-    async function speakWithElevenLabs(cleanText) {
-        const apiKey = localStorage.getItem('elevenlabs_api_key') || (elevenlabsKeyInput ? elevenlabsKeyInput.value.trim() : '');
-        const voiceId = localStorage.getItem('elevenlabs_voice_id') || '21m00Tcm4TlvDq8ikWAM';
-
-        if (!apiKey) {
-            return false; // Silently fallback without forcing modal pop up
-        }
-
-        const robotChar = document.querySelector('.astrotutor-character');
-
-        try {
-            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'audio/mpeg',
-                    'xi-api-key': apiKey,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: cleanText.substring(0, 300),
-                    model_id: 'eleven_multilingual_v2',
-                    voice_settings: {
-                        stability: 0.5,
-                        similarity_boost: 0.75
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                console.warn('ElevenLabs API returned status:', response.status);
-                return false;
-            }
-
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            currentAudioObject = audio;
-
-            audio.onplay = () => {
-                if (robotChar) robotChar.classList.add('is-speaking');
-            };
-
-            audio.onended = audio.onerror = () => {
-                if (robotChar) robotChar.classList.remove('is-speaking');
-                currentAudioObject = null;
-            };
-
-            await audio.play();
-            return true;
-        } catch (err) {
-            console.warn('ElevenLabs Speech fetch exception:', err);
-            if (robotChar) robotChar.classList.remove('is-speaking');
-            return false;
-        }
-    }
-
-    async function speakWithOpenAITTS(cleanText) {
-        const apiKey = localStorage.getItem('elevenlabs_api_key') || localStorage.getItem('openai_api_key') || '';
-        if (!apiKey || (!apiKey.startsWith('sk-') && !apiKey.startsWith('sk_'))) return false;
-
-        const robotChar = document.querySelector('.astrotutor-character');
-        const audioPlayer = document.getElementById('tutor-audio-player');
-
-        try {
-            const response = await fetch('https://api.openai.com/v1/audio/speech', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'tts-1',
-                    input: cleanText.substring(0, 300),
-                    voice: 'alloy'
-                })
-            });
-
-            if (!response.ok) {
-                console.warn('OpenAI TTS API returned status:', response.status);
-                return false;
-            }
-
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-
-            if (audioPlayer) {
-                audioPlayer.src = audioUrl;
-                audioPlayer.onplay = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
-                audioPlayer.onended = audioPlayer.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); };
-                await audioPlayer.play();
-                return true;
-            } else {
-                const audio = new Audio(audioUrl);
-                currentAudioObject = audio;
-                audio.onplay = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
-                audio.onended = audio.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); currentAudioObject = null; };
-                await audio.play();
-                return true;
-            }
-        } catch (err) {
-            console.warn('OpenAI TTS exception:', err);
-            return false;
-        }
-    }
-
-    // Pre-load voices when page starts and cache them
-    let cachedVoices = [];
-    function loadVoices() {
-        const v = window.speechSynthesis.getVoices();
-        if (v.length > 0) cachedVoices = v;
-        return cachedVoices;
-    }
-    if ('speechSynthesis' in window) {
-        loadVoices();
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    function getBestArabicVoice() {
-        const voices = loadVoices();
-        // Priority: ar-SA → ar-EG → any ar-*
-        return voices.find(v => v.lang === 'ar-SA') ||
-               voices.find(v => v.lang === 'ar-EG') ||
-               voices.find(v => v.lang && v.lang.startsWith('ar')) ||
-               null;
-    }
-
-    // Test voice button — tests local fast streaming server
-    const testVoiceBtn = document.getElementById('test-voice-btn');
-    if (testVoiceBtn) {
-        testVoiceBtn.addEventListener('click', () => {
-            const testText = 'أهلاً بيك يا بطل! أنا مستر شريف، يلا بينا نكتشف العلوم سوا!';
-            const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(testText)}`;
-            showToast('🔊 مستر شريف بيتكلم معاك...');
-            const audio = new Audio(ttsUrl);
-            audio.play().then(() => {
-                showToast('✅ الصوت المصري شغال بسرعة وبدون تأخير!');
-            }).catch(() => {
-                showToast('❌ تأكد إن السيرفر شغال');
-            });
-        });
-    }
-
+    // Speech synthesis helper
     function cleanForSpeech(text) {
         let clean = text
             .replace(/\[NAV:[^\]]+\]/g, '')
@@ -272,806 +76,443 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\s+/g, ' ')
             .trim();
 
-        // Take the first 2 concise sentences or max 130 characters for instant speech
         const sentences = clean.split(/[.!؟\n]+/);
-        if (sentences.length > 1 && sentences[0].length >= 25) {
+        if (sentences.length > 1 && sentences[0].length >= 20) {
             clean = sentences.slice(0, 2).join('! ').trim();
         }
-        return clean.substring(0, 130).trim();
+        return clean.substring(0, 140).trim();
     }
 
     function speakText(text) {
         if (!isSoundEnabled) return;
 
-        const robotChar = document.querySelector('.astrotutor-character');
+        const avatarChar = document.querySelector('.mena-avatar') || document.querySelector('.astrotutor-character');
         const cleanText = cleanForSpeech(text);
         if (!cleanText) return;
 
-        // Use local fast streaming TTS server
         const ttsUrl = `http://localhost:8000/tts?text=${encodeURIComponent(cleanText)}`;
         const audioPlayer = document.getElementById('tutor-audio-player');
 
-        if (robotChar) robotChar.classList.add('is-speaking');
+        if (avatarChar) avatarChar.classList.add('is-speaking');
 
         if (audioPlayer) {
-            audioPlayer.pause();
+            try { audioPlayer.pause(); } catch(e){}
             audioPlayer.src = ttsUrl;
             audioPlayer.onended = audioPlayer.onerror = () => {
-                if (robotChar) robotChar.classList.remove('is-speaking');
+                if (avatarChar) avatarChar.classList.remove('is-speaking');
             };
             audioPlayer.play().catch(() => {
-                if (robotChar) robotChar.classList.remove('is-speaking');
+                if (avatarChar) avatarChar.classList.remove('is-speaking');
             });
         } else {
             if (currentAudioObject) {
-                try { currentAudioObject.pause(); } catch(e) {}
+                try { currentAudioObject.pause(); } catch(e){}
             }
             const audio = new Audio(ttsUrl);
             currentAudioObject = audio;
             audio.onended = audio.onerror = () => {
-                if (robotChar) robotChar.classList.remove('is-speaking');
+                if (avatarChar) avatarChar.classList.remove('is-speaking');
             };
             audio.play().catch(() => {
-                if (robotChar) robotChar.classList.remove('is-speaking');
+                if (avatarChar) avatarChar.classList.remove('is-speaking');
             });
         }
     }
 
-    function speakWithWebSpeech(cleanText, robotChar) {
-        if (!('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.lang = 'ar';
-        utterance.rate = 0.85;
-        utterance.volume = 1.0;
-        utterance.onstart = () => { if (robotChar) robotChar.classList.add('is-speaking'); };
-        utterance.onend = utterance.onerror = () => { if (robotChar) robotChar.classList.remove('is-speaking'); };
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function expandSelectiveSection(sectionId) {
-        if (!appContainer) return;
-
-        // Clear layout state classes
-        appContainer.classList.remove('simple-mode', 'expanded-mode', 'show-left-only', 'show-right-only', 'show-full-all');
-
-        // Hide all sections initially
-        sections.forEach(sec => {
-            sec.classList.add('section-hidden');
+    // Test Voice Button
+    const testVoiceBtn = document.getElementById('test-voice-btn');
+    if (testVoiceBtn) {
+        testVoiceBtn.addEventListener('click', () => {
+            const testPhrase = "أهلاً بيك يا بطل! أنا مستر مينا جرجس، يلا بينا نقفل امتحان العلوم سوا!";
+            showToast("🔊 مستر مينا يتحدث معك الآن...");
+            speakText(testPhrase);
         });
+    }
 
-        const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-            targetSection.classList.remove('section-hidden');
-            
-            // Choose column based on section
-            if (sectionId === 'cell-section' || sectionId === 'elements-section') {
-                appContainer.classList.add('show-left-only');
-            } else if (sectionId === 'states-section' || sectionId === 'quiz-section') {
-                appContainer.classList.add('show-right-only');
-            } else {
-                appContainer.classList.add('show-full-all');
-            }
+    // ================= GRADE SWITCHING LOGIC =================
+    function switchGrade(grade) {
+        aiEngine.setGrade(grade);
+
+        if (grade === 'grade1') {
+            tabGrade1.classList.add('active-grade');
+            tabGrade2.classList.remove('active-grade');
+
+            g1Left.classList.remove('hidden');
+            g2Left.classList.add('hidden');
+            g1Right.classList.remove('hidden');
+            g2Right.classList.add('hidden');
+
+            g1Prompts.classList.remove('hidden');
+            g2Prompts.classList.add('hidden');
+
+            if (leftColTitle) leftColTitle.textContent = "مختبر العلوم التفاعلي (1ع)";
+            if (rightColTitle) rightColTitle.textContent = "مختبر الفيزياء والكويز (1ع)";
+            if (welcomeGradeText) welcomeGradeText.textContent = "الصف الأول الإعدادي";
+
+            showToast("تم التبديل إلى منهج الصف الأول الإعدادي (1ع) 🥇");
+            speakText("أهلاً بيك في منهج أولى إعدادي! اختر أي تجربة أو اسألني.");
         } else {
-            appContainer.classList.add('show-full-all');
-            sections.forEach(sec => sec.classList.remove('section-hidden'));
-        }
+            tabGrade2.classList.add('active-grade');
+            tabGrade1.classList.remove('active-grade');
 
-        if (viewBadgeText) viewBadgeText.textContent = 'الوضع البسيط';
-        if (toggleViewBtn) {
-            const icon = toggleViewBtn.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-compress';
-        }
-    }
+            g1Left.classList.add('hidden');
+            g2Left.classList.remove('hidden');
+            g1Right.classList.add('hidden');
+            g2Right.classList.remove('hidden');
 
-    function showAllSections() {
-        if (!appContainer) return;
-        appContainer.classList.remove('simple-mode', 'show-left-only', 'show-right-only');
-        appContainer.classList.add('show-full-all');
-        sections.forEach(sec => {
-            sec.classList.remove('section-hidden');
-        });
-        if (viewBadgeText) viewBadgeText.textContent = 'الوضع البسيط';
-        if (toggleViewBtn) {
-            const icon = toggleViewBtn.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-compress';
+            g1Prompts.classList.add('hidden');
+            g2Prompts.classList.remove('hidden');
+
+            if (leftColTitle) leftColTitle.textContent = "مختبر العلوم التفاعلي (2ع)";
+            if (rightColTitle) rightColTitle.textContent = "مختبر الفيزياء والكويز (2ع)";
+            if (welcomeGradeText) welcomeGradeText.textContent = "الصف الثاني الإعدادي";
+
+            showToast("تم التبديل إلى منهج الصف الثاني الإعدادي (2ع) 🥈");
+            speakText("أهلاً بيك في منهج تانية إعدادي! اختر أي تجربة أو اسألني.");
         }
     }
 
-    function toggleLayout() {
-        if (!appContainer) return;
-        if (appContainer.classList.contains('simple-mode')) {
-            showAllSections();
-        } else {
-            appContainer.classList.remove('expanded-mode', 'show-left-only', 'show-right-only', 'show-full-all');
-            appContainer.classList.add('simple-mode');
-            sections.forEach(sec => {
-                sec.classList.remove('section-hidden');
-            });
-            if (viewBadgeText) viewBadgeText.textContent = 'الوضع الكامل';
-            if (toggleViewBtn) {
-                const icon = toggleViewBtn.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-expand';
-            }
-        }
+    if (tabGrade1 && tabGrade2) {
+        tabGrade1.addEventListener('click', () => switchGrade('grade1'));
+        tabGrade2.addEventListener('click', () => switchGrade('grade2'));
     }
 
-    if (toggleViewBtn) {
-        toggleViewBtn.addEventListener('click', toggleLayout);
-    }
-    
-    // API modal elements
-    const toggleApiSettings = document.getElementById('toggle-api-settings');
-    const apiSettingsPanel = document.getElementById('api-settings-panel');
-    const closeSettingsBtn = document.getElementById('close-settings-btn');
-    const geminiKeyInput = document.getElementById('gemini-key-input');
-    const saveKeyBtn = document.getElementById('save-key-btn');
-    const statusDot = document.querySelector('.status-dot');
-    const statusText = document.getElementById('status-text');
-    const apiBadgeText = document.getElementById('api-badge-text');
-    
-    // Mic recording element
-    const micBtn = document.getElementById('mic-btn');
+    // ================= 1ع: ATOMIC STRUCTURE & ENERGY LEVELS =================
+    const atomSpots = document.querySelectorAll('#g1-atom-section .hotspot');
+    const atomPlaceholder = document.getElementById('atom-placeholder');
+    const atomSpotContent = document.getElementById('atom-spot-content');
+    const atomSpotTitle = document.getElementById('atom-spot-title');
+    const atomSpotText = document.getElementById('atom-spot-text');
+    const atomSpotRule = document.getElementById('atom-spot-rule');
 
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
-
-    // Sidebar navigation and columns
-    const sections = document.querySelectorAll('.edu-section');
-
-    // Setup stored API Key
-    if (aiEngine.isApiKeyActive()) {
-        if (geminiKeyInput) geminiKeyInput.value = aiEngine.apiKey;
-        if (statusDot) statusDot.className = 'status-dot active';
-        if (statusText) statusText.textContent = 'مفتاح API نشط';
-        if (toggleApiSettings) toggleApiSettings.classList.add('active-mode');
-        if (apiBadgeText) apiBadgeText.textContent = 'الذكاء الاصطناعي نشط';
-    }
-
-    // Modal triggers
-    toggleApiSettings.addEventListener('click', () => {
-        apiSettingsPanel.classList.remove('hidden');
-    });
-
-    closeSettingsBtn.addEventListener('click', () => {
-        apiSettingsPanel.classList.add('hidden');
-    });
-
-    // Close modal on background click
-    apiSettingsPanel.addEventListener('click', (e) => {
-        if (e.target === apiSettingsPanel) {
-            apiSettingsPanel.classList.add('hidden');
-        }
-    });
-
-    // Save API key
-    saveKeyBtn.addEventListener('click', () => {
-        const key = geminiKeyInput.value.trim();
-        if (key === "") {
-            aiEngine.clearApiKey();
-            statusDot.className = 'status-dot simulated';
-            statusText.textContent = 'وضع المحاكاة النشط';
-            toggleApiSettings.classList.remove('active-mode');
-            apiBadgeText.textContent = 'وضع المحاكاة';
-            showToast('تم الرجوع إلى وضع المحاكاة المحلي.');
-            apiSettingsPanel.classList.add('hidden');
-        } else {
-            const success = aiEngine.setApiKey(key);
-            if (success) {
-                statusDot.className = 'status-dot active';
-                statusText.textContent = 'مفتاح API نشط';
-                toggleApiSettings.classList.add('active-mode');
-                apiBadgeText.textContent = 'الذكاء الاصطناعي نشط';
-                showToast('تم حفظ مفتاح API وتفعيله بنجاح! 🚀');
-                apiSettingsPanel.classList.add('hidden');
-            } else {
-                showToast('عذراً، يبدو أن مفتاح API غير صالح.');
-            }
-        }
-    });
-
-    // Toast message trigger
-    function showToast(message) {
-        toastMessage.textContent = message;
-        toast.classList.remove('hidden');
-        setTimeout(() => {
-            toast.classList.add('hidden');
-        }, 3500);
-    }
-
-    // Highlighting section visually
-    function highlightSection(sectionElement) {
-        sections.forEach(s => s.classList.remove('active-highlight'));
-        sectionElement.classList.add('active-highlight');
-    }
-
-
-    // ================= 1. CELL INTERACTIVE HOTSPOTS (BIOLOGY) =================
-    const hotspots = document.querySelectorAll('.hotspot');
-    const sunInfoPanel = document.getElementById('sun-info-panel');
-    const sunSpotContent = document.getElementById('sun-spot-content');
-    const sunPlaceholderText = sunInfoPanel.querySelector('.card-placeholder-text');
-    const sunSpotTitle = document.getElementById('sun-spot-title');
-    const sunSpotText = document.getElementById('sun-spot-text');
-    const sunSpotTemp = document.getElementById('sun-spot-temp');
-
-    const cellData = {
+    const atomData = {
         nucleus: {
-            title: '1. النواة (Nucleus)',
-            text: 'هي "العقل المدبر" ومركز التحكم الرئيسي في الخلية الحية. تحتوي على المادة الوراثية (DNA) وتوجه كل الأنشطة الحيوية وانقسام الخلية لتكوين خلايا جديدة.',
-            temp: 'مركز التحكم الوراثي والتكاثر'
+            title: 'النواة الذرية الموجبة (+P / ±N)',
+            text: 'توجد في مركز الذرة وتتركز فيها كتلة الذرة. تحتوي على بروتونات موجبة (+) ونيوترونات متعادلة (±).',
+            rule: 'العدد الكتلي = البروتونات + النيوترونات'
         },
-        mitochondria: {
-            title: '2. الميتوكوندريا (Mitochondria)',
-            text: 'هي "مصانع الطاقة" للخلية الحية. تقوم بعملية التنفس الخلوي وحرق سكر الجلوكوز لإنتاج مركب الطاقة ATP الذي يمد الخلية بالحيوية والحركة.',
-            temp: 'إنتاج الطاقة الخلوية (ATP)'
+        'level-k': {
+            title: 'المستوى K (المستوى الأول)',
+            text: 'أقرب المستويات إلى النواة وأقلها في الطاقة، ويتشبع بـ 2 إلكترون كحد أقصى طبقاً للقاعدة 2n².',
+            rule: '2 × (1)² = 2 إلكترون'
         },
-        cytoplasm: {
-            title: '3. السيتوبلازم (Cytoplasm)',
-            text: 'هو السائل الهلامي شبه الشفاف الذي يملأ تجويف الخلية الحية وتسبح فيه كل العضيات الأخرى. يتكون معظمه من الماء والمواد الغذائية المنحلة وتحدث فيه الكثير من العمليات الحيوية.',
-            temp: 'الوسط المائي للتفاعلات الحيوية'
+        'level-l': {
+            title: 'المستوى L (المستوى الثاني)',
+            text: 'يتشبع بـ 8 إلكترونات كحد أقصى، وطاقته أعلى من المستوى K.',
+            rule: '2 × (2)² = 8 إلكترونات'
+        },
+        'level-m': {
+            title: 'المستوى M (المستوى الثالث)',
+            text: 'يتشبع بـ 18 إلكترون كحد أقصى، ولا يتحمل أي مستوى طاقة خارجي أكثر من 8 إلكترونات.',
+            rule: '2 × (3)² = 18 إلكترون'
         }
     };
 
-    hotspots.forEach(spot => {
+    const atomVoiceTexts = {
+        nucleus: 'النواة موجبة الشحنة وتتركز فيها كتلة الذرة بالكامل لأن جواها بروتونات موجبة ونيوترونات متعادلة!',
+        'level-k': 'المستوى K هو أقرب المستويات للنواة وأقلها طاقة ويتشبع باثنين إلكترون حسب قاعدة 2n²!',
+        'level-l': 'المستوى L هو المستوى الثاني ويتشبع بـ 8 إلكترونات!',
+        'level-m': 'المستوى M هو المستوى الثالث ويتشبع بـ 18 إلكترون كحد أقصى!'
+    };
+
+    atomSpots.forEach(spot => {
         spot.addEventListener('click', () => {
             const spotKey = spot.getAttribute('data-spot');
-            activateSunSpot(spotKey, true);
+            activateAtomSpot(spotKey, true);
         });
     });
 
-    const spotVoiceTexts = {
-        nucleus: 'رقم 1 النواة: هي مخ الخلية ومركز التحكم، وجواها الحمض النووي DNA!',
-        mitochondria: 'رقم 2 الميتوكوندريا: دي مصنع الطاقة الحقيقي اللي بيولد مركبات ATP!',
-        cytoplasm: 'رقم 3 السيتوبلازم: السائل الهلامي الحيوي اللي بتسبح فيه كل العضيات!'
-    };
+    function activateAtomSpot(spotKey, speakOutLoud = false) {
+        atomSpots.forEach(s => s.classList.remove('active-spot'));
+        const active = document.querySelector(`#g1-atom-section .hotspot[data-spot="${spotKey}"]`);
+        if (active) active.classList.add('active-spot');
 
-    function activateSunSpot(spotKey, speakOutLoud = false) {
-        hotspots.forEach(s => s.classList.remove('active-spot'));
-        const activeSpot = document.querySelector(`.hotspot[data-spot="${spotKey}"]`);
-        if (activeSpot) activeSpot.classList.add('active-spot');
+        const data = atomData[spotKey];
+        if (data && atomSpotContent) {
+            if (atomPlaceholder) atomPlaceholder.classList.add('hidden');
+            atomSpotContent.classList.remove('hidden');
+            atomSpotTitle.textContent = data.title;
+            atomSpotText.textContent = data.text;
+            atomSpotRule.textContent = data.rule;
 
-        const data = cellData[spotKey];
-        if (data) {
-            sunPlaceholderText.classList.add('hidden');
-            sunSpotContent.classList.remove('hidden');
-            
-            sunSpotContent.style.opacity = 0;
-            setTimeout(() => {
-                sunSpotTitle.textContent = data.title;
-                sunSpotText.textContent = data.text;
-                sunSpotTemp.textContent = data.temp;
-                sunSpotContent.style.opacity = 1;
-                sunSpotContent.style.transition = 'opacity 0.3s ease';
-            }, 100);
-
-            if (speakOutLoud && spotVoiceTexts[spotKey]) {
-                speakText(spotVoiceTexts[spotKey]);
+            if (speakOutLoud && atomVoiceTexts[spotKey]) {
+                speakText(atomVoiceTexts[spotKey]);
             }
         }
     }
 
+    // ================= 1ع: DENSITY & FLOATING LAB =================
+    const densityCards = document.querySelectorAll('#g1-density-section .planet-card-mini');
+    const densityName = document.getElementById('density-item-name');
+    const densityDesc = document.getElementById('density-item-desc');
+    const densityVal = document.getElementById('density-val');
+    const densityBar = document.getElementById('density-bar');
 
-    // ================= 2. CHEMICAL ELEMENTS EXPLORER =================
-    const planetCards = document.querySelectorAll('.planet-card-mini');
-    const explorerPlanetName = document.getElementById('explorer-planet-name');
-    const explorerPlanetDesc = document.getElementById('explorer-planet-desc');
-    const planetFactsList = document.getElementById('planet-facts-list');
-    
-    const gravityBar = document.getElementById('gravity-bar');
-    const gravityVal = document.getElementById('gravity-val');
-    const distanceBar = document.getElementById('distance-bar');
-    const distanceVal = document.getElementById('distance-val');
-    const diameterBar = document.getElementById('diameter-bar');
-    const diameterVal = document.getElementById('diameter-val');
-
-    const chemicalData = {
-        hydrogen: {
-            name: 'عنصر الهيدروجين (Hydrogen - H)',
-            desc: 'أبسط وأخف العناصر الكيميائية في الجدول الدوري والكون على الإطلاق.',
-            gravity: '1',
-            gravityWidth: '5%',
-            distance: '1.008 جرام/مول',
-            distanceWidth: '10%',
-            diameter: '-252.9°م',
-            diameterWidth: '8%',
-            facts: [
-                'يمثل حوالي 75% من الكتلة الكلية لعناصر الكون الفسيح.',
-                'هو المكون الرئيسي للمياه عند اندماجه مع الأكسجين والمصدر الأساسي لطاقة النجوم.'
-            ]
-        },
-        oxygen: {
-            name: 'عنصر الأكسجين (Oxygen - O)',
-            desc: 'غاز الحياة الأساسي والضروري لعمليات التنفس الكائناتي والاحتراق على كوكب الأرض.',
-            gravity: '8',
-            gravityWidth: '30%',
-            distance: '15.999 جرام/مول',
-            distanceWidth: '28%',
-            diameter: '-183.0°م',
-            diameterWidth: '14%',
-            facts: [
-                'يشكل حوالي 21% من الحجم الكلي للغلاف الجوي للأرض.',
-                'يدخل في تركيب جميع المواد العضوية والمياه وهو العنصر الأكثر وفرة في القشرة الأرضية.'
-            ]
-        },
-        carbon: {
-            name: 'عنصر الكربون (Carbon - C)',
-            desc: 'العنصر السحري الأساسي لجميع المركبات الحيوية والكيمياء العضوية على الأرض.',
-            gravity: '6',
-            gravityWidth: '22%',
-            distance: '12.011 جرام/مول',
-            distanceWidth: '22%',
-            diameter: '4,827°م',
-            diameterWidth: '82%',
-            facts: [
-                'يمكن أن يتواجد كفحم كربوني هش أسود أو يتحول تحت الضغط الهائل إلى ألماس صلب براق.',
-                'يمتلك قدرة فريدة على تكوين 4 روابط كيميائية قوية مع العناصر الأخرى.'
-            ]
-        },
-        iron: {
-            name: 'عنصر الحديد (Iron - Fe)',
-            desc: 'معدن انتقالي يتميز بصلابة شديدة، وهو أساس الصناعات الثقيلة والهندسة الإنشائية.',
-            gravity: '26',
-            gravityWidth: '95%',
-            distance: '55.845 جرام/مول',
-            distanceWidth: '98%',
-            diameter: '2,862°م',
-            diameterWidth: '55%',
-            facts: [
-                'عنصر حيوي يدخل في تركيب الهيموجلوبين في خلايا الدم لنقل الأكسجين بالأنحاء.',
-                'يمتلك خصائص مغناطيسية قوية وهو المكون الأساسي لل لب المعدني للأرض.'
-            ]
-        }
+    const densityData = {
+        wood: { name: 'قطعة الخشب', desc: 'كثافة الخشب (0.6 جم/سم³) أقل من كثافة الماء (1 جم/سم³) فتطفو على السطح.', val: '0.6 جم/سم³', width: '30%', voice: 'الخشب كثافته 0.6 أقل من المية علشان كده بيطفو على السطح!' },
+        cork: { name: 'سدادة الفلين', desc: 'كثافة الفلين (0.2 جم/سم³) خفيفة جداً وأقل من الماء فتطفو تماماً.', val: '0.2 جم/سم³', width: '15%', voice: 'الفلين خفيف جداً وكثافته 0.2 ويطفو فوق الماء بسهولة!' },
+        iron: { name: 'مسمار الحديد', desc: 'كثافة الحديد (7.8 جم/سم³) أكبر بكثير من كثافة الماء فيغوص فوراً في القاع.', val: '7.8 جم/سم³', width: '78%', voice: 'الحديد كثافته 7.8 أكبر من المية علشان كده بيغوص في القاع فوراً!' },
+        gold: { name: 'خاتم الذهب', desc: 'كثافة الذهب عالية جداً (19.3 جم/سم³) فيغوص بسرعة إلى أعمق نقطة.', val: '19.3 جم/سم³', width: '95%', voice: 'الذهب معدن ثقيل وكثافته 19.3 ويغوص في قاع الإناء!' }
     };
 
-    const elementVoiceTexts = {
-        hydrogen: 'عنصر الهيدروجين: أبسط وأخف عناصر الكون وعدده الذري 1!',
-        oxygen: 'عنصر الأكسجين: غاز التنفس والحياة الأساسي وعدده الذري 8!',
-        carbon: 'عنصر الكربون: أساس الكيمياء العضوية وكل الكائنات وعدده الذري 6!',
-        iron: 'عنصر الحديد: معدن القوة والصلابة وهيموجلوبين الدم وعدده الذري 26!'
-    };
-
-    planetCards.forEach(card => {
+    densityCards.forEach(card => {
         card.addEventListener('click', () => {
-            const planetKey = card.getAttribute('data-planet');
-            activatePlanet(planetKey, true);
+            const key = card.getAttribute('data-density');
+            activateDensity(key, true);
         });
     });
 
-    function activatePlanet(planetKey, speakOutLoud = false) {
-        planetCards.forEach(c => c.classList.remove('active-card'));
-        const activeCard = document.querySelector(`.planet-card-mini[data-planet="${planetKey}"]`);
-        if (activeCard) activeCard.classList.add('active-card');
+    function activateDensity(key, speakOutLoud = false) {
+        densityCards.forEach(c => c.classList.remove('active-card'));
+        const active = document.querySelector(`#g1-density-section .planet-card-mini[data-density="${key}"]`);
+        if (active) active.classList.add('active-card');
 
-        const data = chemicalData[planetKey];
-        if (data) {
-            explorerPlanetName.textContent = data.name;
-            explorerPlanetDesc.textContent = data.desc;
-            
-            gravityBar.style.width = data.gravityWidth;
-            gravityVal.textContent = data.gravity;
-            distanceBar.style.width = data.distanceWidth;
-            distanceVal.textContent = data.distance;
-            diameterBar.style.width = data.diameterWidth;
-            diameterVal.textContent = data.diameter;
-
-            planetFactsList.innerHTML = '';
-            data.facts.forEach(fact => {
-                const li = document.createElement('li');
-                li.textContent = fact;
-                planetFactsList.appendChild(li);
-            });
-
-            if (speakOutLoud && elementVoiceTexts[planetKey]) {
-                speakText(elementVoiceTexts[planetKey]);
-            }
+        const d = densityData[key];
+        if (d && densityName) {
+            densityName.textContent = d.name;
+            densityDesc.textContent = d.desc;
+            densityVal.textContent = d.val;
+            densityBar.style.width = d.width;
+            if (speakOutLoud) speakText(d.voice);
         }
     }
 
+    // ================= 1ع: PENDULUM ENERGY LAB =================
+    const energyBtns = document.querySelectorAll('.energy-btn');
+    const energyTitle = document.getElementById('energy-state-title');
+    const energyDesc = document.getElementById('energy-state-desc');
 
-    // ================= 3. PHYSICS MOLECULAR PARTICLES SIMULATION =================
-    const particlesContainer = document.getElementById('particles-container');
-    const stateButtons = document.querySelectorAll('.state-btn');
-    const stateTitle = document.getElementById('gas-planet-title');
-    const stateDesc = document.getElementById('gas-planet-desc');
-    const stateEnergyTag = document.getElementById('state-energy-tag');
-
-    const statesData = {
-        solid: {
-            title: 'الحالة الصلبة (Solid State)',
-            desc: 'تكون الجزيئات متراصة ومتقاربة جداً بقوة ترابط عملاقة. حركتها محدودة للغاية وتتحرك حركة اهتزازية سريعة وبسيطة في أماكنها دون مغادرتها، لذلك تحافظ على شكل وحجم ثابت.',
-            energy: 'طاقة حركية منخفضة جداً'
-        },
-        liquid: {
-            title: 'الحالة السائلة (Liquid State)',
-            desc: 'تكون المسافات بين الجزيئات أكبر وقوى الترابط أضعف من الصلبة. تتمتع الجزيئات بحرية كافية للانزلاق والحركة فوق بعضها البعض، لذلك لها حجم ثابت وتأخذ شكل الوعاء.',
-            energy: 'طاقة حركية متوسطة'
-        },
-        gas: {
-            title: 'الحالة الغازية (Gas State)',
-            desc: 'تكون الجزيئات متباعدة جداً وقوى الترابط بينها تكاد تكون منعدمة. تتحرك الجزيئات بحرية كاملة وسرعة فائقة في جميع الاتجاهات، وتتصادم وتملأ أي مساحة متاحة.',
-            energy: 'طاقة حركية عالية جداً'
-        }
-    };
-
-    let particles = [];
-    let currentState = 'solid';
-    const numParticles = 45;
-
-    // Initialize particles coordinates and velocities
-    function initParticles() {
-        particlesContainer.innerHTML = '';
-        particles = [];
-        
-        for (let i = 0; i < numParticles; i++) {
-            const particleDiv = document.createElement('div');
-            particleDiv.className = 'particle';
-            particlesContainer.appendChild(particleDiv);
-
-            particles.push({
-                element: particleDiv,
-                x: 0,
-                y: 0,
-                vx: 0,
-                vy: 0,
-                baseX: 0,
-                baseY: 0
-            });
-        }
-        
-        updateParticlesConfig();
-    }
-
-    // Update coordinates configuration depending on the selected state
-    function updateParticlesConfig() {
-        const width = particlesContainer.clientWidth || 300;
-        const height = particlesContainer.clientHeight || 180;
-        
-        particles.forEach((p, idx) => {
-            if (currentState === 'solid') {
-                // Arrange particles in a tight crystal grid in the center
-                const cols = 9;
-                const r = idx % cols;
-                const c = Math.floor(idx / cols);
-                p.baseX = (width / 2 - 60) + r * 15;
-                p.baseY = (height / 2 - 35) + c * 15;
-                p.x = p.baseX;
-                p.y = p.baseY;
-                p.vx = 0;
-                p.vy = 0;
-            } else if (currentState === 'liquid') {
-                // Settle particles at the bottom of the container with slow motion
-                p.x = Math.random() * (width - 15);
-                p.y = (height / 2) + Math.random() * (height / 2 - 15);
-                p.vx = (Math.random() - 0.5) * 1.5;
-                p.vy = (Math.random() - 0.5) * 1.0;
-            } else if (currentState === 'gas') {
-                // Spread particles everywhere with high speeds
-                p.x = Math.random() * (width - 15);
-                p.y = Math.random() * (height - 15);
-                p.vx = (Math.random() - 0.5) * 6;
-                p.vy = (Math.random() - 0.5) * 6;
-            }
-        });
-    }
-
-    // Animation Loop
-    function animateParticles() {
-        const width = particlesContainer.clientWidth || 300;
-        const height = particlesContainer.clientHeight || 180;
-
-        particles.forEach(p => {
-            if (currentState === 'solid') {
-                // Vibration simulation
-                p.x = p.baseX + (Math.random() - 0.5) * 2.5;
-                p.y = p.baseY + (Math.random() - 0.5) * 2.5;
-            } else if (currentState === 'liquid') {
-                // Moving slowly and bouncing at bottom half
-                p.x += p.vx;
-                p.y += p.vy;
-
-                // Bounce off boundaries of bottom half
-                if (p.x < 0 || p.x > width - 10) p.vx *= -1;
-                if (p.y < height / 2 - 10 || p.y > height - 10) p.vy *= -1;
-                
-                // Boundaries clamping
-                p.x = Math.max(0, Math.min(width - 10, p.x));
-                p.y = Math.max(height / 2 - 10, Math.min(height - 10, p.y));
-            } else if (currentState === 'gas') {
-                // Rapid free movement everywhere
-                p.x += p.vx;
-                p.y += p.vy;
-
-                // Bounce off container walls
-                if (p.x < 0 || p.x > width - 10) p.vx *= -1;
-                if (p.y < 0 || p.y > height - 10) p.vy *= -1;
-
-                p.x = Math.max(0, Math.min(width - 10, p.x));
-                p.y = Math.max(0, Math.min(height - 10, p.y));
-            }
-
-            // Apply visual positions
-            p.element.style.transform = `translate(${p.x}px, ${p.y}px)`;
-        });
-
-        requestAnimationFrame(animateParticles);
-    }
-
-    const stateVoiceTexts = {
-        solid: 'الحالة الصلبة: الجزيئات متراصة جداً وبتتحرك حركة اهتزازية بس في مكانها!',
-        liquid: 'الحالة السائلة: الجزيئات بتنزلق فوق بعضها وبتاخد شكل الوعاء!',
-        gas: 'الحالة الغازية: الجزيئات حرة وسريعة جداً وبتملأ أي مساحة متاحة!'
-    };
-
-    stateButtons.forEach(btn => {
+    energyBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const stateKey = btn.getAttribute('data-state');
-            activateState(stateKey, true);
+            const state = btn.getAttribute('data-pendulum');
+            energyBtns.forEach(b => b.classList.remove('active-state'));
+            btn.classList.add('active-state');
+            if (state === 'highest') {
+                energyTitle.textContent = 'عند أقصى إزاحة (أعلى نقطة)';
+                energyDesc.textContent = 'تكون طاقة الوضع = الطاقة الميكانيكية، وطاقة الحركة = صفر لانعدام السرعة.';
+                speakText('عند أعلى نقطة طاقة الوضع بتكون أكبر ما يمكن وطاقة الحركة صفر لأن السرعة صفر!');
+            } else {
+                energyTitle.textContent = 'عند موضع السكون (أقصى سرعة)';
+                energyDesc.textContent = 'تكون طاقة الحركة أكبر ما يمكن، وطاقة الوضع أقل ما يمكن، والمجموع الميكانيكي ثابت دائماً.';
+                speakText('عند موضع السكون السرعة بتكون أقصى ما يمكن وطاقة الحركة أكبر ما يمكن!');
+            }
         });
     });
 
-    function activateState(stateKey, speakOutLoud = false) {
-        stateButtons.forEach(b => b.classList.remove('active-state'));
-        const activeBtn = document.querySelector(`.state-btn[data-state="${stateKey}"]`);
-        if (activeBtn) activeBtn.classList.add('active-state');
+    // ================= 2ع: PERIODIC TABLE LAB =================
+    const groupCards = document.querySelectorAll('#g2-periodic-section .planet-card-mini');
+    const groupName = document.getElementById('group-explorer-name');
+    const groupDesc = document.getElementById('group-explorer-desc');
+    const groupVal = document.getElementById('group-activity-val');
+    const groupBar = document.getElementById('group-activity-bar');
 
-        currentState = stateKey;
-        updateParticlesConfig();
+    const groupData = {
+        alkali: { name: 'فلزات الأقلاء (المجموعة 1A)', desc: 'فلزات أحادية التكافؤ، نشطة جداً كيميائياً، وتحفظ تحت سطح الكيروسين.', val: 'أحادي (+1) - عالي جداً', width: '90%', voice: 'الأقلاء فلزات نشطة جداً أحادية التكافؤ وتتفاعل مع الماء بعنف مع تصاعد الهيدروجين!' },
+        halogens: { name: 'الهالوجينات (المجموعة 7A)', desc: 'لافلزات أحادية التكافؤ تتحد مع الفلزات مكونة أملاحاً، وتوجد في صورة جزيئات ثنائية الذرة.', val: 'أحادي (-1) - عالي جداً', width: '85%', voice: 'الهالوجينات لافلزات نشطة تتحد مع الفلزات لتكوين الأملاح زي كلوريد الصوديوم!' },
+        noble: { name: 'الغازات الخاملة (المجموعة 18)', desc: 'عناصر مستقرة كيميائياً لا تشترك في التفاعلات لاكتمال مستوى طاقتها الخارجي بـ 8 إلكترونات.', val: 'صفر (مكتمل)', width: '10%', voice: 'الغازات الخاملة تكافؤها صفر ومستوى طاقتها الأخير مكتمل بثمانية إلكترونات!' },
+        water: { name: 'مركب الماء (H₂O)', desc: 'مركب قطبي يتميز بشذوذ خواصه وارتفاع درجتي غليانه وانصهاره بسبب الروابط الهيدروجينية.', val: 'رابطة هيدروجينية فريدة', width: '95%', voice: 'الماء مركب فريد بسبب الروابط الهيدروجينية اللي بتخليه يغلي عند 100 ويتجمد عند صفر!' }
+    };
 
-        const data = statesData[stateKey];
-        if (data) {
-            stateTitle.textContent = data.title;
-            stateDesc.textContent = data.desc;
-            stateEnergyTag.textContent = data.energy;
-
-            if (speakOutLoud && stateVoiceTexts[stateKey]) {
-                speakText(stateVoiceTexts[stateKey]);
+    groupCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const key = card.getAttribute('data-group');
+            groupCards.forEach(c => c.classList.remove('active-card'));
+            card.classList.add('active-card');
+            const d = groupData[key];
+            if (d && groupName) {
+                groupName.textContent = d.name;
+                groupDesc.textContent = d.desc;
+                groupVal.textContent = d.val;
+                groupBar.style.width = d.width;
+                speakText(d.voice);
             }
-        }
-    }
+        });
+    });
 
+    // ================= 2ع: ATMOSPHERE LAYERS LAB =================
+    const layerCards = document.querySelectorAll('#g2-atmosphere-section .planet-card-mini');
+    const layerName = document.getElementById('layer-name');
+    const layerDesc = document.getElementById('layer-desc');
+    const layerTempVal = document.getElementById('layer-temp-val');
+    const layerTempBar = document.getElementById('layer-temp-bar');
 
-    // ================= 4. SCIENCE INTERACTIVE QUIZ =================
-    const startQuizBtn = document.getElementById('start-quiz-btn');
-    const restartQuizBtn = document.getElementById('restart-quiz-btn');
-    const askAiResultBtn = document.getElementById('ask-ai-result-btn');
-    const quizIntro = document.getElementById('quiz-intro');
-    const quizPlay = document.getElementById('quiz-play');
-    const quizResult = document.getElementById('quiz-result');
-    
-    const quizProgressFill = document.getElementById('quiz-progress-fill');
-    const questionNumText = document.getElementById('question-num');
-    const questionText = document.getElementById('question-text');
-    const answersGrid = document.getElementById('answers-grid');
-    
-    const resultTitle = document.getElementById('result-title');
-    const resultText = document.getElementById('result-text');
+    const layerData = {
+        troposphere: { name: 'طبقة التروبوسفير (طبقة الطقس)', desc: 'تمتد حتى 13 كم، تحدث بها كافة التقلبات الجوية وتحتوي على 75% من كتلة الهواء.', temp: '-60°م', width: '25%', voice: 'التروبوسفير هي الطبقة الأولى وفيها كل التقلبات الجوية و75% من هواء الغلاف الجوي!' },
+        stratosphere: { name: 'طبقة الستراتوسفير (طبقة الأوزون)', desc: 'تمتد من 13 كم حتى 50 كم، خالية من الغيوم والاضطرابات وتحتوي على طبقة الأوزون الواقية.', temp: '0°م', width: '50%', voice: 'الستراتوسفير مناسبة لحركة الطائرات وفيها طبقة الأوزون اللي بتحمينا من الأشعة فوق البنفسجية!' },
+        mesosphere: { name: 'طبقة الميزوسفير (أبرد الطبقات)', desc: 'تمتد حتى 85 كم، أبرد طبقات الغلاف الجوي وتتكون فيها الشهب نتيجة الاحتكاك بالهواء.', temp: '-90°م', width: '10%', voice: 'الميزوسفير هي أبرد طبقة في الغلاف الجوي وبتتكون فيها الشهب اللي بتحمي الأرض!' },
+        thermosphere: { name: 'طبقة الثرموسفير (الطبقة الحرارية)', desc: 'تمتد حتى 675 كم، أسخن الطبقات وتصل حرارتها إلى 1200°م ويوجد في أعلاها الأيونوسفير.', temp: '1200°م', width: '95%', voice: 'الثرموسفير هي أعلى وأسخن الطبقات وفيها الأيونوسفير المستخدم في الاتصالات اللاسلكية!' }
+    };
 
-    const quizQuestions = [
-        {
-            question: "ما هي وحدة البناء والتركيب الأساسية في جسم الكائن الحي؟",
-            answers: ["الذرة الكيميائية", "الخلية الحية", "العنصر النقي", "الجزيء العضوي"],
-            correctIndex: 1
-        },
-        {
-            question: "أي من العناصر الكيميائية التالية يعتبر غازاً في درجة الحرارة الطبيعية وضروري للتنفس؟",
-            answers: ["الحديد (Fe)", "الكربون (C)", "الأكسجين (O)", "النحاس (Cu)"],
-            correctIndex: 2
-        },
-        {
-            question: "في أي حالة من حالات المادة تكون الجزيئات متباعدة جداً وقوى الترابط بينها شبه منعدمة؟",
-            answers: ["الحالة الصلبة", "الحالة السائلة", "الحالة الغازية", "الحالة الكريستالية"],
-            correctIndex: 2
-        }
+    layerCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const key = card.getAttribute('data-layer');
+            layerCards.forEach(c => c.classList.remove('active-card'));
+            card.classList.add('active-card');
+            const d = layerData[key];
+            if (d && layerName) {
+                layerName.textContent = d.name;
+                layerDesc.textContent = d.desc;
+                layerTempVal.textContent = d.temp;
+                layerTempBar.style.width = d.width;
+                speakText(d.voice);
+            }
+        });
+    });
+
+    // ================= QUIZ 1ع ENGINE =================
+    const g1Questions = [
+        { q: "ما هي وحدة قياس الكثافة في النظام الدولي؟", a: ["جرام / سم³", "متر / ثانية", "نيوتن", "جول"], c: 0 },
+        { q: "المستوى الثاني L يتشبع بحد أقصى بـ كم إلكترون طبقاً للقاعدة (2n²)؟", a: ["2 إلكترون", "8 إلكترونات", "18 إلكترون", "32 إلكترون"], c: 1 },
+        { q: "عند أقصى ارتفاع يصل إليه البندول البسيط، تكون طاقة الحركة مساوية لـ:", a: ["أقصى قيمة", "نصف الطاقة", "صفر", "الطاقة الميكانيكية"], c: 2 },
+        { q: "أي المواد التالية تطفو فوق سطح الماء بسبب انخفاض كثافتها؟", a: ["مسمار الحديد", "قطعة الفلين", "عملة النحاس", "سلسلة الذهب"], c: 1 }
     ];
 
-    let currentQuestionIdx = 0;
-    let userScore = 0;
-    let quizActive = false;
+    let g1Idx = 0, g1Score = 0;
+    const g1StartBtn = document.getElementById('g1-start-quiz-btn');
+    const g1RestartBtn = document.getElementById('g1-restart-btn');
+    const g1Intro = document.getElementById('g1-quiz-intro');
+    const g1Play = document.getElementById('g1-quiz-play');
+    const g1Result = document.getElementById('g1-quiz-result');
+    const g1QNum = document.getElementById('g1-q-num');
+    const g1QText = document.getElementById('g1-q-text');
+    const g1Grid = document.getElementById('g1-answers-grid');
+    const g1Progress = document.getElementById('g1-quiz-progress');
 
-    startQuizBtn.addEventListener('click', startQuiz);
-    restartQuizBtn.addEventListener('click', startQuiz);
-    
-    askAiResultBtn.addEventListener('click', () => {
-        const message = `أهلاً مستر شريف، لقد أنهيت كويز العلوم وحصلت على نتيجة ${userScore} من ${quizQuestions.length}. حلل مستواي بكلمات تشجيعية!`;
-        handleUserMessage(message);
-    });
-
-    function startQuiz() {
-        currentQuestionIdx = 0;
-        userScore = 0;
-        quizActive = true;
-        
-        quizIntro.classList.add('hidden');
-        quizResult.classList.add('hidden');
-        quizPlay.classList.remove('hidden');
-        
-        showQuestion();
+    function startG1Quiz() {
+        g1Idx = 0; g1Score = 0;
+        g1Intro.classList.add('hidden');
+        g1Result.classList.add('hidden');
+        g1Play.classList.remove('hidden');
+        showG1Q();
     }
 
-    function showQuestion() {
-        const currentQ = quizQuestions[currentQuestionIdx];
-        
-        const progressPercentage = ((currentQuestionIdx) / quizQuestions.length) * 100;
-        quizProgressFill.style.width = `${progressPercentage}%`;
-        
-        questionNumText.textContent = `السؤال ${currentQuestionIdx + 1} من ${quizQuestions.length}`;
-        questionText.textContent = currentQ.question;
-        
-        answersGrid.innerHTML = '';
-        currentQ.answers.forEach((ans, idx) => {
+    function showG1Q() {
+        const item = g1Questions[g1Idx];
+        g1Progress.style.width = `${(g1Idx / g1Questions.length) * 100}%`;
+        g1QNum.textContent = `السؤال ${g1Idx + 1} من ${g1Questions.length}`;
+        g1QText.textContent = item.q;
+        g1Grid.innerHTML = '';
+        item.a.forEach((ans, i) => {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.textContent = ans;
-            btn.addEventListener('click', () => selectAnswer(btn, idx));
-            answersGrid.appendChild(btn);
+            btn.addEventListener('click', () => {
+                const all = g1Grid.querySelectorAll('.answer-btn');
+                all.forEach(b => b.style.pointerEvents = 'none');
+                if (i === item.c) {
+                    btn.classList.add('correct');
+                    g1Score++;
+                    speakText("الله ينور عليك يا بطل! إجابة صحيحة!");
+                } else {
+                    btn.classList.add('incorrect');
+                    all[item.c].classList.add('correct');
+                    speakText("معلش يا بطل، ركز في السؤال اللي جاي!");
+                }
+                setTimeout(() => {
+                    g1Idx++;
+                    if (g1Idx < g1Questions.length) showG1Q();
+                    else finishG1Quiz();
+                }, 1400);
+            });
+            g1Grid.appendChild(btn);
         });
     }
 
-    function selectAnswer(selectedBtn, answerIdx) {
-        const currentQ = quizQuestions[currentQuestionIdx];
-        const answerButtons = answersGrid.querySelectorAll('.answer-btn');
-        
-        answerButtons.forEach(btn => btn.style.pointerEvents = 'none');
-
-        if (answerIdx === currentQ.correctIndex) {
-            selectedBtn.classList.add('correct');
-            userScore++;
-            speakText('الله ينور عليك يا بطل! إجابة صحيحة وممتازة!');
-        } else {
-            selectedBtn.classList.add('incorrect');
-            answerButtons[currentQ.correctIndex].classList.add('correct');
-            speakText('معلش يا بطل، ركز في السؤال اللي جاي وهتعوضها!');
-        }
-
-        setTimeout(() => {
-            currentQuestionIdx++;
-            if (currentQuestionIdx < quizQuestions.length) {
-                showQuestion();
-            } else {
-                showResult();
-            }
-        }, 1500);
+    function finishG1Quiz() {
+        g1Play.classList.add('hidden');
+        g1Result.classList.remove('hidden');
+        g1Progress.style.width = '100%';
+        const title = document.getElementById('g1-res-title');
+        const text = document.getElementById('g1-res-text');
+        title.textContent = g1Score === 4 ? "ممتاز جداً يا بطل! 🏆 (درجة كاملة)" : "أحسنت يا بطل! 👏";
+        text.textContent = `لقد حصلت على ${g1Score} من 4 أسئلة صحيحة في كويز 1ع.`;
+        speakText(g1Score === 4 ? "عاش يا بطل! قفلت كويز أولى إعدادي بنجاح 4 من 4!" : `ممتاز يا بطل! نتيجتك ${g1Score} من 4.`);
     }
 
-    function showResult() {
-        quizActive = false;
-        quizPlay.classList.add('hidden');
-        quizResult.classList.remove('hidden');
-        
-        quizProgressFill.style.width = '100%';
+    if (g1StartBtn) g1StartBtn.addEventListener('click', startG1Quiz);
+    if (g1RestartBtn) g1RestartBtn.addEventListener('click', startG1Quiz);
 
-        if (userScore === quizQuestions.length) {
-            resultTitle.textContent = "عبقري العلوم الصغير! 🏆";
-            resultText.textContent = `ممتاز يا بطل! لقد حصلت على الدرجة النهائية ${userScore}/${quizQuestions.length} بنسبة 100%!`;
-            speakText('عاش يا بطل! درجتك كاملة 3 من 3!');
-        } else if (userScore > 0) {
-            resultTitle.textContent = "مستكشف علمي رائع! 💫";
-            resultText.textContent = `عمل جيد! حصلت على نتيجة ${userScore} من ${quizQuestions.length}. كرر المحاولة للوصول للدرجة النهائية!`;
-            speakText(`أحسنت يا بطل! درجتك ${userScore} من 3.`);
-        } else {
-            resultTitle.textContent = "حاول مجدداً يا بطل! 🔬";
-            resultText.textContent = `لم تجب على أي سؤال. اسأل مستر شريف عن الدروس وسيعلمك كل شيء مجدداً!`;
-            speakText('راجع المجسمات وجرب الكويز تاني يا بطل!');
-        }
+    // ================= QUIZ 2ع ENGINE =================
+    const g2Questions = [
+        { q: "رتب العالم موزلي العناصر في جدوله الدوري تصاعدياً حسب:", a: ["أوزانها الذرية", "أعدادها الذرية", "كثافتها", "سالبية ذراتها"], c: 1 },
+        { q: "توجد طبقة الأوزون الحامية لكوكب الأرض في طبقة:", a: ["التروبوسفير", "الستراتوسفير", "الميزوسفير", "الثرموسفير"], c: 1 },
+        { q: "شذوذ خواص الماء يرجع إلى وجود روابط بين جزيئاته تسمى روابط:", a: ["أيونية", "تساهمية", "هيدروجينية", "فلزية"], c: 2 },
+        { q: "تعتبر حفرية الماموث المحفوظة في الجليد مثالاً لـ:", a: ["حفرية كائن كامل", "حفرية قالب مصمت", "حفرية طابع", "أخشاب متحجرة"], c: 0 }
+    ];
+
+    let g2Idx = 0, g2Score = 0;
+    const g2StartBtn = document.getElementById('g2-start-quiz-btn');
+    const g2RestartBtn = document.getElementById('g2-restart-btn');
+    const g2Intro = document.getElementById('g2-quiz-intro');
+    const g2Play = document.getElementById('g2-quiz-play');
+    const g2Result = document.getElementById('g2-quiz-result');
+    const g2QNum = document.getElementById('g2-q-num');
+    const g2QText = document.getElementById('g2-q-text');
+    const g2Grid = document.getElementById('g2-answers-grid');
+    const g2Progress = document.getElementById('g2-quiz-progress');
+
+    function startG2Quiz() {
+        g2Idx = 0; g2Score = 0;
+        g2Intro.classList.add('hidden');
+        g2Result.classList.add('hidden');
+        g2Play.classList.remove('hidden');
+        showG2Q();
     }
 
-
-    // ================= 5. VOICE RECOGNITION (WEB SPEECH API) =================
-    let recognitionInstance = null;
-    let isRecording = false;
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    micBtn.addEventListener('click', () => {
-        if (!SpeechRecognition) {
-            showToast("عذراً، متصفحك الحالي لا يدعم خاصية التسجيل الصوتي. يرجى الكتابة.");
-            return;
-        }
-
-        if (isRecording && recognitionInstance) {
-            try {
-                recognitionInstance.stop();
-            } catch(e) {}
-            return;
-        }
-
-        try {
-            // Create a fresh SpeechRecognition instance on each start
-            recognitionInstance = new SpeechRecognition();
-            recognitionInstance.lang = 'ar-EG';
-            recognitionInstance.continuous = true;
-            recognitionInstance.interimResults = true;
-            recognitionInstance.maxAlternatives = 1;
-
-            let finalTranscript = '';
-
-            recognitionInstance.onstart = () => {
-                isRecording = true;
-                micBtn.classList.add('active-recording');
-                chatInput.placeholder = "جاري الاستماع... تحدث الآن بصوتك 🎤";
-                showToast("جاري الاستماع... تحدث الآن بصوتك 🎤");
-            };
-
-            let silenceTimer = null;
-
-            recognitionInstance.onresult = (event) => {
-                let currentText = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        currentText += event.results[i][0].transcript;
-                    }
+    function showG2Q() {
+        const item = g2Questions[g2Idx];
+        g2Progress.style.width = `${(g2Idx / g2Questions.length) * 100}%`;
+        g2QNum.textContent = `السؤال ${g2Idx + 1} من ${g2Questions.length}`;
+        g2QText.textContent = item.q;
+        g2Grid.innerHTML = '';
+        item.a.forEach((ans, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'answer-btn';
+            btn.textContent = ans;
+            btn.addEventListener('click', () => {
+                const all = g2Grid.querySelectorAll('.answer-btn');
+                all.forEach(b => b.style.pointerEvents = 'none');
+                if (i === item.c) {
+                    btn.classList.add('correct');
+                    g2Score++;
+                    speakText("الله ينور عليك يا بطل! إجابة صحيحة وممتازة!");
+                } else {
+                    btn.classList.add('incorrect');
+                    all[item.c].classList.add('correct');
+                    speakText("معلش يا بطل، ركز في السؤال اللي جاي!");
                 }
-                const fullText = finalTranscript || currentText;
-                if (fullText) {
-                    chatInput.value = fullText;
-                    chatInput.style.height = 'auto';
-                    chatInput.style.height = (chatInput.scrollHeight - 10) + 'px';
-                }
+                setTimeout(() => {
+                    g2Idx++;
+                    if (g2Idx < g2Questions.length) showG2Q();
+                    else finishG2Quiz();
+                }, 1400);
+            });
+            g2Grid.appendChild(btn);
+        });
+    }
 
-                // Automatically stop recording after 1.2s of silence when user stops talking
-                if (silenceTimer) clearTimeout(silenceTimer);
-                silenceTimer = setTimeout(() => {
-                    if (isRecording && recognitionInstance) {
-                        try {
-                            recognitionInstance.stop();
-                        } catch(e) {}
-                    }
-                }, 1200);
-            };
+    function finishG2Quiz() {
+        g2Play.classList.add('hidden');
+        g2Result.classList.remove('hidden');
+        g2Progress.style.width = '100%';
+        const title = document.getElementById('g2-res-title');
+        const text = document.getElementById('g2-res-text');
+        title.textContent = g2Score === 4 ? "ممتاز جداً يا بطل! 🏆 (درجة كاملة)" : "أحسنت يا بطل! 👏";
+        text.textContent = `لقد حصلت على ${g2Score} من 4 أسئلة صحيحة في كويز 2ع.`;
+        speakText(g2Score === 4 ? "عاش يا بطل! قفلت كويز تانية إعدادي بنجاح 4 من 4!" : `ممتاز يا بطل! نتيجتك ${g2Score} من 4.`);
+    }
 
-            recognitionInstance.onend = () => {
-                if (silenceTimer) clearTimeout(silenceTimer);
-                isRecording = false;
-                micBtn.classList.remove('active-recording');
-                chatInput.placeholder = "اضغط على المايك وتحدث أو اكتب سؤالك هنا...";
-                
-                // Auto submit captured text immediately
-                const textToSend = chatInput.value.trim();
-                if (textToSend) {
-                    setTimeout(() => {
-                        sendBtn.click();
-                    }, 300);
-                }
-            };
+    if (g2StartBtn) g2StartBtn.addEventListener('click', startG2Quiz);
+    if (g2RestartBtn) g2RestartBtn.addEventListener('click', startG2Quiz);
 
-            recognitionInstance.onerror = (event) => {
-                console.warn("Speech recognition error:", event.error);
-                isRecording = false;
-                micBtn.classList.remove('active-recording');
-                chatInput.placeholder = "اضغط على المايك وتحدث أو اكتب سؤالك هنا...";
-
-                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                    showToast("يرجى السماح للمتصفح باستخدام الميكروفون (Allow Microphone) 🎤");
-                }
-            };
-
-            recognitionInstance.start();
-        } catch (err) {
-            console.error("Speech recognition start failed:", err);
-            isRecording = false;
-            micBtn.classList.remove('active-recording');
-        }
+    // ================= PROMPT CHIPS & CHAT =================
+    document.querySelectorAll('.prompt-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const prompt = chip.getAttribute('data-prompt');
+            handleUserMessage(prompt);
+        });
     });
 
-
-    function primeAudioPlayer() {
-        if (!isSoundEnabled) return;
-        const audioPlayer = document.getElementById('tutor-audio-player');
-        if (audioPlayer) {
-            audioPlayer.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-            audioPlayer.play().catch(() => {});
-        }
-        if ('speechSynthesis' in window) {
-            try {
-                window.speechSynthesis.resume();
-            } catch(e){}
-        }
-    }
-
-    // ================= 6. CHAT CONSOLE LOGIC =================
     sendBtn.addEventListener('click', () => {
         const text = chatInput.value.trim();
         if (text) {
@@ -1088,175 +529,181 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Auto-grow input text area
-    chatInput.addEventListener('input', () => {
-        chatInput.style.height = 'auto';
-        chatInput.style.height = (chatInput.scrollHeight - 10) + 'px';
-    });
-
     clearChatBtn.addEventListener('click', () => {
         chatMessagesContainer.innerHTML = `
             <div id="latest-tutor-message" class="animate-fade-in">
-                <p>تم تصفير سجل الأسئلة! 🧬</p>
-                <p>أنا مستعد لأسئلتك الآن. تحدث بصوتك مباشرة أو اكتب سؤالك.</p>
+                <p>تم تصفير المحادثة يا بطل! 🧪</p>
+                <p>أنا مستر مينا جرجس، اسألني في أي وقت عن المذكرات أو كتاب الامتحان.</p>
             </div>
         `;
     });
 
-    promptChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            const promptText = chip.getAttribute('data-prompt');
-            handleUserMessage(promptText);
-        });
-    });
-
     async function handleUserMessage(message) {
-        primeAudioPlayer(); // Synchronously prime audio gesture before async delay!
         appendMessage('student', message);
         const loadingId = appendLoadingBubble();
 
         try {
-            const response = await aiEngine.getResponse(message);
+            const res = await aiEngine.getResponse(message);
             removeLoadingBubble(loadingId);
-            appendMessage('tutor', response.text);
-            
-            // Speak response vocally out loud
-            speakText(response.text);
+            appendMessage('tutor', res.text);
+            speakText(res.text);
 
-            if (response.nav) {
-                executeNavigationCommand(response.nav);
+            if (res.nav) {
+                executeNavigation(res.nav);
             }
-        } catch (error) {
+        } catch (e) {
             removeLoadingBubble(loadingId);
-            appendMessage('tutor', `عذراً يا صديقي، حدث خطأ أثناء معالجة السؤال. تأكد من اتصال الإنترنت أو صحة مفتاح API.`);
-            console.error(error);
+            appendMessage('tutor', 'عذراً يا بطل، حدث خطأ أثناء المعالجة. حاول مرة أخرى!');
+        }
+    }
+
+    function executeNavigation(navStr) {
+        const parts = navStr.split(':');
+        const secId = parts[0];
+        const detail = parts[1];
+
+        // Ensure grade tab matches section
+        if (secId.startsWith('g1-')) {
+            if (tabGrade1 && !tabGrade1.classList.contains('active-grade')) switchGrade('grade1');
+        } else if (secId.startsWith('g2-')) {
+            if (tabGrade2 && !tabGrade2.classList.contains('active-grade')) switchGrade('grade2');
+        }
+
+        if (detail) {
+            if (secId === 'g1-atom-section') activateAtomSpot(detail);
+            if (secId === 'g1-density-section') activateDensity(detail);
+            if (secId === 'g2-periodic-section') {
+                const card = document.querySelector(`#g2-periodic-section .planet-card-mini[data-group="${detail}"]`);
+                if (card) card.click();
+            }
         }
     }
 
     function appendMessage(sender, text) {
-        const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-        
-        let formattedText = text
-            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
-
-        const lineDiv = document.createElement('div');
-        lineDiv.className = `chat-line ${sender === 'student' ? 'student-line' : 'tutor-line'}`;
-        
-        lineDiv.style.marginBottom = '12px';
-        lineDiv.style.borderBottom = '1px dashed rgba(0, 255, 210, 0.05)';
-        lineDiv.style.paddingBottom = '8px';
-        
-        if (sender === 'student') {
-            lineDiv.innerHTML = `
-                <span style="color:var(--neon-teal); font-weight:700; font-size:0.75rem; display:block;">أنت (${time}):</span>
-                <p style="color:#d1fae5; margin-top:2px;">${formattedText}</p>
-            `;
-        } else {
-            lineDiv.innerHTML = `
-                <span style="color:var(--neon-blue); font-weight:700; font-size:0.75rem; display:block;">مستر شريف (${time}):</span>
-                <p style="color:#f1f5f9; margin-top:2px;">${formattedText}</p>
-            `;
-        }
-
-        chatMessagesContainer.appendChild(lineDiv);
+        const div = document.createElement('div');
+        div.className = sender === 'student' ? 'user-message animate-fade-in' : 'tutor-response animate-fade-in';
+        div.innerHTML = `<p>${text}</p>`;
+        chatMessagesContainer.appendChild(div);
         chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
     }
 
     function appendLoadingBubble() {
-        const loadingId = 'loading-' + Date.now();
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = loadingId;
-        loadingDiv.style.padding = '8px 0';
-        loadingDiv.innerHTML = `
-            <div style="display:flex; gap:8px; align-items:center; font-size:0.78rem; color:var(--text-muted);">
-                <i class="fa-solid fa-spinner spinner-icon" style="animation: spin 1s infinite linear;"></i>
-                <span>مستر شريف يقوم بتحليل الشرح العلمي والتنقل...</span>
-            </div>
-        `;
-        chatMessagesContainer.appendChild(loadingDiv);
+        const id = 'loading-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'tutor-response animate-fade-in';
+        div.innerHTML = '<p class="typing-indicator"><span>.</span><span>.</span><span>.</span> يقوم مستر مينا بالتفكير وتجهيز الشرح</p>';
+        chatMessagesContainer.appendChild(div);
         chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        return loadingId;
+        return id;
     }
 
     function removeLoadingBubble(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.remove();
-        }
+        const el = document.getElementById(id);
+        if (el) el.remove();
     }
 
+    // ================= MICROPHONE SPEECH RECOGNITION =================
+    const micBtn = document.getElementById('mic-btn');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let isRecording = false;
+    let recognition = null;
 
-    // ================= 7. SCROLL NAVIGATION ROUTER =================
-    function executeNavigationCommand(navString) {
-        const parts = navString.split(':');
-        const sectionId = parts[0];
-        const detailKey = parts[1] || null;
-
-        expandSelectiveSection(sectionId);
-
-        const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-            let guidanceMsg = "يوجهك مستر شريف إلى لوحة الشرح المناسبة...";
-            
-            if (sectionId === 'cell-section') {
-                guidanceMsg = "يوجهك مستر شريف إلى مجسم الخلية الحية! 🧬";
-                const spotToActivate = detailKey || 'nucleus';
-                activateSunSpot(spotToActivate);
-            } else if (sectionId === 'elements-section') {
-                if (detailKey) {
-                    const arabicName = chemicalData[detailKey] ? chemicalData[detailKey].name.split(' ')[1] : detailKey;
-                    guidanceMsg = `يوجهك مستر شريف لعرض عنصر ${arabicName}! 🧪`;
-                    activatePlanet(detailKey);
-                } else {
-                    guidanceMsg = "يوجهك مستر شريف لقسم العناصر والمواد! 🧪";
-                }
-            } else if (sectionId === 'states-section') {
-                if (detailKey) {
-                    const arabicName = statesData[detailKey] ? statesData[detailKey].title.split(' ')[0] : detailKey;
-                    guidanceMsg = `يوجهك مستر شريف لمحاكاة جزيئات المادة ${arabicName}! 🌡️`;
-                    activateState(detailKey);
-                } else {
-                    guidanceMsg = "يوجهك مستر شريف لمحاكاة سلوك جزيئات المادة! 🌡️";
-                }
-            } else if (sectionId === 'quiz-section') {
-                guidanceMsg = "يوجهك مستر شريف إلى تحدي كويز العلوم! 🎓";
-                if (!quizActive) {
-                    setTimeout(() => startQuiz(), 1200);
-                }
+    if (micBtn && SpeechRecognition) {
+        micBtn.addEventListener('click', () => {
+            if (isRecording && recognition) {
+                recognition.stop();
+                return;
             }
 
-            // Show center banner
-            guidanceText.textContent = guidanceMsg;
-            guidanceBanner.classList.remove('hidden');
-            
-            setTimeout(() => {
-                guidanceBanner.classList.add('hidden');
-            }, 3000);
+            try {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ar-EG';
+                recognition.continuous = false;
+                recognition.interimResults = false;
 
-            // Animate robot head screen when navigating
-            const robotScreen = document.querySelector('.robot-screen');
-            robotScreen.style.borderColor = 'var(--neon-green)';
-            setTimeout(() => {
-                robotScreen.style.borderColor = 'rgba(0, 255, 210, 0.2)';
-            }, 2500);
+                recognition.onstart = () => {
+                    isRecording = true;
+                    micBtn.classList.add('recording-active');
+                    showToast('🎙️ جاري الاستماع إلى صوتك الآن...');
+                };
 
-            // Scroll the target section
-            setTimeout(() => {
-                const column = targetSection.closest('.column-scroll-content');
-                if (column) {
-                    column.scrollTop = targetSection.offsetTop - 20;
-                } else {
-                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                highlightSection(targetSection);
-            }, 300);
-        }
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    chatInput.value = speechResult;
+                    handleUserMessage(speechResult);
+                };
+
+                recognition.onerror = () => {
+                    showToast('لم يتم التقاط الصوت، حاول مجدداً.');
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    micBtn.classList.remove('recording-active');
+                };
+
+                recognition.start();
+            } catch(e) {
+                showToast('خطأ في تشغيل المايك');
+            }
+        });
     }
 
-    // Default Initialization
-    activatePlanet('carbon');
-    initParticles();
-    animateParticles();
-    activateState('solid');
+    // API Modal Handlers
+    const apiModal = document.getElementById('api-settings-modal');
+    const toggleApiBtn = document.getElementById('toggle-api-settings');
+    const closeApiBtn = document.getElementById('close-api-modal');
+    const saveApiBtn = document.getElementById('save-api-keys-btn');
+    const geminiInput = document.getElementById('gemini-api-key-input');
+    const elevenKeyInput = document.getElementById('elevenlabs-api-key-input');
+    const elevenVoiceInput = document.getElementById('elevenlabs-voice-id-input');
+
+    if (toggleApiBtn) {
+        toggleApiBtn.addEventListener('click', () => {
+            if (geminiInput) geminiInput.value = localStorage.getItem('gemini_api_key') || '';
+            if (elevenKeyInput) elevenKeyInput.value = localStorage.getItem('elevenlabs_api_key') || '';
+            if (elevenVoiceInput) elevenVoiceInput.value = localStorage.getItem('elevenlabs_voice_id') || '';
+            apiModal.classList.remove('hidden');
+        });
+    }
+
+    if (closeApiBtn) {
+        closeApiBtn.addEventListener('click', () => apiModal.classList.add('hidden'));
+    }
+
+    if (saveApiBtn) {
+        saveApiBtn.addEventListener('click', () => {
+            if (geminiInput) localStorage.setItem('gemini_api_key', geminiInput.value.trim());
+            if (elevenKeyInput) localStorage.setItem('elevenlabs_api_key', elevenKeyInput.value.trim());
+            if (elevenVoiceInput) localStorage.setItem('elevenlabs_voice_id', elevenVoiceInput.value.trim());
+            showToast('✅ تم حفظ إعدادات الـ API بنجاح!');
+            apiModal.classList.add('hidden');
+        });
+    }
+
+    // View Mode Toggle (Simple / Expanded)
+    if (toggleViewBtn) {
+        toggleViewBtn.addEventListener('click', () => {
+            if (appContainer.classList.contains('simple-mode')) {
+                appContainer.classList.remove('simple-mode');
+                appContainer.classList.add('show-full-all');
+                viewBadgeText.textContent = 'الوضع المبسط';
+            } else {
+                appContainer.classList.add('simple-mode');
+                appContainer.classList.remove('show-full-all');
+                viewBadgeText.textContent = 'الوضع الكامل';
+            }
+        });
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-message');
+        if (toast && toastMsg) {
+            toastMsg.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+    }
 });

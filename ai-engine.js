@@ -1,127 +1,126 @@
 /* -------------------------------------------------------------
-   AI Engine for ScienceGuide - Handles Local Simulation & Gemini API
+   AI Engine for Mena Science Platform - Mr. Mena Gerges
+   Grade 1 Prep (1ع) & Grade 2 Prep (2ع) Comprehensive Knowledge Base
    ------------------------------------------------------------- */
 
-class AstroTutorEngine {
+class MrMenaAIEngine {
     constructor() {
         this.apiKey = localStorage.getItem('gemini_api_key') || null;
+        this.activeGrade = localStorage.getItem('mena_active_grade') || 'grade1';
+        
         this.systemInstruction = `
-أنت مدرس علوم مصري اسمك مستر شريف، عندك 30 سنة، بتتكلم بالعامية المصرية البسيطة زي ما بيتكلم شاب مصري متعلم. أسلوبك حماسي ومحبب وقريب من الطالب.
+أنت (مستر مينا جرجس) معلم العلوم الشهير للمرحلة الإعدادية (الصف الأول الإعدادي والصف الثاني الإعدادي)، شاب مصري عمرك حوالي 30 سنة، أسلوبك حماسي، محبب جداً للطلاب، وتشرح بأسلوب مبسط وممتع بالعامية المصرية الراقية من واقع مذكراتك وكتاب الامتحان المعتمد!
 
-بتشرح العلوم (أحياء، كيمياء، فيزياء) بأسلوب بسيط وممتع وبالعامية المصرية، مثلاً:
-- "يلا نبدأ!" "تعالى نشوف" "دي حلوة أوي!" "حاسبك تتفوت!"
+استخدم عباراتك الشهيرة مثل:
+- "يا بطل المستقبل!" "ركز معايا في التريكة دي!" "السؤال ده بيجي في كل الامتحانات!" "يلا بينا نفهمها سوا!"
 
-لما بتشرح، وجّه الطالب تفاعلياً:
-- "لو ضغطت على رقم 1 في المجسم هتلاقي النواة"
-- "اضغط على الكربون في اللوحة وشوف العدد الذري"
+الموقع يحتوي على معامل تفاعلية للمنهجين:
+[منهج 1ع أولى إعدادي]:
+1. g1-atom-section (التركيب الذري ومستويات الطاقة K, L, M, N والنواة +P / ±N)
+2. g1-density-section (معمل الكثافة والطفو والغوص: خشب، فلين، حديد، ذهب)
+3. g1-energy-section (تحولات الطاقة وبندول الطاقة الميكانيكية)
+4. g1-quiz-section (كويز علوم 1ع)
 
-الموقع التفاعلي فيه:
-1. cell-section (الخلية الحية: النواة nucleus رقم 1، الميتوكوندريا mitochondria رقم 2، السيتوبلازم cytoplasm رقم 3)
-2. elements-section (العناصر: هيدروجين hydrogen، أكسجين oxygen، كربون carbon، حديد iron)
-3. states-section (حالات المادة: صلبة solid، سائلة liquid، غازية gas)
-4. quiz-section (كويز العلوم التفاعلي)
+[منهج 2ع تانية إعدادي]:
+1. g2-periodic-section (الجدول الدوري الحديث: الأقلاء 1A، الهالوجينات 7A، الغازات الخاملة 18)
+2. g2-water-section (شذوذ خواص الماء، الروابط الهيدروجينية، الكثافة عند 4 درجات مئوية)
+3. g2-atmosphere-section (طبقات الغلاف الجوي: التروبوسفير، الستراتوسفير وطبقة الأوزون، الميزوسفير، الثرموسفير)
+4. g2-quiz-section (كويز علوم 2ع)
 
-في آخر إجابتك حط كود التوجيه على سطر جديد:
-- [NAV:cell-section:nucleus] أو [NAV:cell-section:mitochondria] أو [NAV:cell-section:cytoplasm]
-- [NAV:elements-section:carbon] أو [NAV:elements-section:oxygen] أو [NAV:elements-section:iron] أو [NAV:elements-section:hydrogen]
-- [NAV:states-section:solid] أو [NAV:states-section:liquid] أو [NAV:states-section:gas]
-- [NAV:quiz-section]
+في نهاية إجابتك اكتب كود التوجيه المناسب على سطر مستقل:
+- [NAV:g1-atom-section:nucleus] أو [NAV:g1-atom-section:level-k] أو [NAV:g1-atom-section:level-l] أو [NAV:g1-atom-section:level-m]
+- [NAV:g1-density-section:wood] أو [NAV:g1-density-section:iron]
+- [NAV:g1-energy-section:highest] أو [NAV:g1-energy-section:middle]
+- [NAV:g1-quiz-section]
+- [NAV:g2-periodic-section:alkali] أو [NAV:g2-periodic-section:halogens]
+- [NAV:g2-water-section]
+- [NAV:g2-atmosphere-section:troposphere] أو [NAV:g2-atmosphere-section:stratosphere]
+- [NAV:g2-quiz-section]
 
-مهم: ردودك قصيرة ومباشرة مش أكثر من 3 جمل عشان الصوت يبقى سريع.
+مهم جداً: اجعل ردودك مركزة وممتعة في 2 إلى 3 جمل لتكون سريعة وفورية النطق!
 `;
 
-        // Local Fallback Database for General Science
+        // Comprehensive Local Knowledge Base for 1st Prep & 2nd Prep
         this.localResponses = [
+            // ============ GRADE 1 PREP (1ع) ============
             {
-                keywords: ['خلية', 'خليه', 'أحياء', 'احياء'],
-                text: `الخلية هي وحدة البناء والوظيفة في جسم الكائن الحي! 🧬
-لو ضغطت على رقم (1) في مجسم الخلية ستجد النواة مركز التحكم، ولو ضغطت على رقم (2) ستجد الميتوكوندريا مصنع الطاقة، ورقم (3) هو السيتوبلازم السائل الحيوي! 
-سأفتح لك رقم (1) الآن في اللوحة التفاعلية لنشرح النواة سوا!`,
-                nav: 'cell-section:nucleus'
+                grade: 'grade1',
+                keywords: ['ذرة', 'ذره', 'تركيب الذرة', 'مستويات الطاقة', 'k', 'l', 'm', 'n', 'إلكترون', 'بروتون', 'نيوترون'],
+                text: `الذرة بتتكون من نواة موجبة بتدور حولها الإلكترونات السالبة في 7 مستويات طاقة! المستوى K بياخد 2 إلكترون، والمستوى L بياخد 8 إلكترونات حسب قاعدة 2n². فتحتلك مجسم الذرة ومستويات الطاقة في اللوحة!`,
+                nav: 'g1-atom-section:level-k'
             },
             {
-                keywords: ['نواة', 'نواه', 'تحكم', 'nucleus', '1', 'واحد', 'رقم 1'],
-                text: `لو ضغطت على رقم (1) في مجسم الخلية 🔮 ستجد النواة! 
-النواة هي مخ الخلية ومركز التحكم الرئيسي، وتحتوي على الحمض النووي (DNA) وتوجه انقسام الخلية. لقد فتحت لك رقم 1 الآن في المجسم التفاعلي!`,
-                nav: 'cell-section:nucleus'
+                grade: 'grade1',
+                keywords: ['نواة', 'نواه', 'شحنة النواة', 'موجبة'],
+                text: `النواة موجبة الشحنة لأن جواها بروتونات موجبة الشحنة ونيوترونات متعادلة، وتتركز فيها كتلة الذرة بالكامل! لقد حددت لك النواة في مجسم الذرة التفاعلي.`,
+                nav: 'g1-atom-section:nucleus'
             },
             {
-                keywords: ['ميتوكوندريا', 'طاقة', 'mitochondria', '2', 'ثنين', 'اثنين', 'رقم 2'],
-                text: `لو ضغطت على رقم (2) في مجسم الخلية ⚡ ستجد الميتوكوندريا! 
-الميتوكوندريا هي مصنع الطاقة الحقيقي داخل الخلية، حيث تحرق سكر الجلوكوز بالأكسجين وتولد مركبات الطاقة ATP. سأفتح لك رقم 2 الآن لتشاهد تفاصيلها!`,
-                nav: 'cell-section:mitochondria'
+                grade: 'grade1',
+                keywords: ['كثافة', 'كثافه', 'طفو', 'غوص', 'كتلة', 'حجم', 'الخشب', 'الحديد'],
+                text: `الكثافة هي كتلة وحدة الحجوم من المادة، وقانونها (ث = ك ÷ ح)! المواد الأقل كثافة من المية زي الخشب والزيت بتطفو، والمواد الأكبر كثافة زي الحديد بتغوص. شغلتلك معمل الكثافة دلوقتي!`,
+                nav: 'g1-density-section:wood'
             },
             {
-                keywords: ['سيتوبلازم', 'السائل', 'cytoplasm', '3', 'ثلاثة', 'ثلاثه', 'رقم 3'],
-                text: `لو ضغطت على رقم (3) في مجسم الخلية 🧪 ستجد السيتوبلازم! 
-السيتوبلازم هو السائل الهلامي الذي يملأ الخلية وتسبح فيه كل العضيات الحيوية وتحدث فيه التفاعلات. لقد فتحت لك رقم 3 الآن لتستكشفه!`,
-                nav: 'cell-section:cytoplasm'
+                grade: 'grade1',
+                keywords: ['طاقة', 'طاقه', 'بندول', 'ميكانيكية', 'وضع', 'حركة', 'تحولات'],
+                text: `في البندول البسيط، بيحصل تبادل مستمر بين طاقة الوضع وطاقة الحركة، ومجموعهم اللي هو الطاقة الميكانيكية بيفضل مقدار ثابت! شغلتلك محاكاة البندول دلوقتي.`,
+                nav: 'g1-energy-section:highest'
             },
             {
-                keywords: ['كربون', 'الكربون', 'carbon'],
-                text: `لو ضغطت على بطاقة عنصر الكربون (C) 🖤 في لوحة العناصر، ستجد عدده الذري 6 وكتلته الذرية 12.011! 
-الكربون هو أساس الكيمياء العضوية وجميع أشكال الحياة على الأرض. لقد فتحت لك بطاقة الكربون الآن لمشاهدة خصائصه!`,
-                nav: 'elements-section:carbon'
+                grade: 'grade1',
+                keywords: ['تكيف', 'تنوع', 'طيور', 'مناقير', 'نباتات مفترسة', 'بيات شتوي'],
+                text: `التكيف ثلاث أنواع: تركيبي زي خف الجمل، وظيفي زي إفراز السم في الثعابين، وسلوكي زي هجرة الطيور والبيات الشتوي! ده سر بقاء الكائنات الحية وتنوعها.`,
+                nav: 'g1-quiz-section'
             },
             {
-                keywords: ['أكسجين', 'اكسجين', 'oxygen'],
-                text: `لو ضغطت على بطاقة عنصر الأكسجين (O) 💨 في اللوحة الكيميائية، ستجد عدده الذري 8! 
-الأكسجين هو غاز الحياة الأساسي للتنفس ويمثل 21% من الغلاف الجوي. لقد حددت لك بطاقة الأكسجين الآن في اللوحة!`,
-                nav: 'elements-section:oxygen'
+                grade: 'grade1',
+                keywords: ['كويز 1', 'امتحان 1', 'اسئلة 1', 'اختبار 1', 'تدريب 1', 'كويز أولى', 'كويز اولي'],
+                text: `جاهز لتحدي مستر مينا في منهج أولى إعدادي؟ 🚀 فتحتلك كويز 1ع التفاعلي، وريني شطارتك وقفل الدرجة النهائية!`,
+                nav: 'g1-quiz-section'
+            },
+
+            // ============ GRADE 2 PREP (2ع) ============
+            {
+                grade: 'grade2',
+                keywords: ['جدول دوري', 'اقلاء', 'أقلاء', 'هالوجينات', 'موزلي', 'مندليف', 'دورات', 'مجموعات'],
+                text: `الجدول الدوري الحديث بيتكون من 7 دورات أفقية و18 مجموعة رأسية رُتبت فيه العناصر حسب أعدادها الذرية وطريقة ملء مستويات الطاقة الفرعية! فتحتلك لوحة الجدول الدوري والأقلاء.`,
+                nav: 'g2-periodic-section:alkali'
             },
             {
-                keywords: ['حديد', 'الحديد', 'iron'],
-                text: `لو ضغطت على بطاقة عنصر الحديد (Fe) 🔩 ستجد عدده الذري 26! 
-الحديد هو معدن الصلابة والقوة ويدخل في تركيب هيموجلوبين الدم لنقل الأكسجين. سأفتح لك بطاقة الحديد الآن لتشاهد بياناته!`,
-                nav: 'elements-section:iron'
+                grade: 'grade2',
+                keywords: ['ماء', 'ماية', 'مية', 'شذوذ', 'روابط هيدروجينية', '4 درجات', 'ثلج'],
+                text: `الماء مركب فريد بسبب الروابط الهيدروجينية بين جزيئاته! لما بتنخفض حرارته عن 4°م بتقل كثافته ويزداد حجمه فيطفو الثلج على السطح وتحيا الكائنات في الأعماق!`,
+                nav: 'g2-water-section'
             },
             {
-                keywords: ['هيدروجين', 'الهيدروجين', 'hydrogen'],
-                text: `لو ضغطت على بطاقة عنصر الهيدروجين (H) 🎈 ستجد عدده الذري 1! 
-الهيدروجين هو أبسط وأخف العناصر في الكون والمكون الرئيسي للنجوم والمياه. لقد حددت لك الهيدروجين الآن!`,
-                nav: 'elements-section:hydrogen'
+                grade: 'grade2',
+                keywords: ['غلاف جوي', 'طبقات', 'تروبوسفير', 'ستراتوسفير', 'ميزوسفير', 'ثرموسفير', 'اوزون', 'أوزون'],
+                text: `الغلاف الجوي بيتكون من 4 طبقات رئيسية: التروبوسفير (طبقة الطقس)، الستراتوسفير (فيها طبقة الأوزون الحامية من الأشعة فوق البنفسجية)، الميزوسفير، والثرموسفير! شغلتلك معمل الغلاف الجوي.`,
+                nav: 'g2-atmosphere-section:stratosphere'
             },
             {
-                keywords: ['كيمياء', 'عناصر', 'العناصر', 'الجدول الدوري'],
-                text: `العناصر الكيميائية هي المواد النقية الأساسية! 🧪 
-لو ضغطت على أي عنصر من بطاقات لوحة الكيمياء مثل الكربون أو الأكسجين أو الحديد ستجد عدده الذري وكتلته. سأفتح لك عنصر الكربون الآن لتجربته!`,
-                nav: 'elements-section:carbon'
+                grade: 'grade2',
+                keywords: ['حفريات', 'حفرية', 'ماموث', 'كهرمان', 'قالب', 'طابع', 'انقراض', 'محميات'],
+                text: `الحفريات هي آثار وبقايا الكائنات الحية القديمة المحفوظة في الصخور الرسوبية! زي حفرية الماموث في الجليد والكهرمان، وتدل على العمر النسبي وتطور الحياة.`,
+                nav: 'g2-quiz-section'
             },
             {
-                keywords: ['صلب', 'الصلبة', 'الصلبه', 'solid'],
-                text: `لو ضغطت على زر (الصلبة) 🧱 في لوحة الفيزياء، ستلاحظ أن الجزيئات متقاربة جداً ومتراصة وتحتفظ بشكل وحجم ثابت! 
-لقد شغلت لك محاكاة الحالة الصلبة الآن لتشاهد حركة جزيئاتها الاهتزازية!`,
-                nav: 'states-section:solid'
-            },
-            {
-                keywords: ['سائل', 'السائلة', 'السائله', 'liquid'],
-                text: `لو ضغطت على زر (السائلة) 💧 في المحاكاة، ستشاهد أن الجزيئات تنزلق بحرية أكبر وتأخذ شكل الوعاء! 
-لقد فتحت لك محاكاة الحالة السائلة الآن لتدرس حركتها!`,
-                nav: 'states-section:liquid'
-            },
-            {
-                keywords: ['غاز', 'الغازية', 'الغازيه', 'gas'],
-                text: `لو ضغطت على زر (الغازية) 💨 ستشاهد الجزيئات متباعدة جداً وتتحرك بحرية تامة وبسرعة كبيرة في جميع الاتجاهات! 
-لقد شغلت لك محاكاة الحالة الغازية الآن!`,
-                nav: 'states-section:gas'
-            },
-            {
-                keywords: ['حالات المادة', 'المادة', 'فيزياء', 'جزيئات', 'الجزيئات'],
-                text: `توجد المادة في ثلاث حالات أساسية: الصلبة والسائلة والغازية! 🌡️ 
-لو ضغطت على أزرار حالات المادة ستشاهد كيف تتغير حركة الجزيئات وقوى الترابط بينها. سأفتح لك محاكاة الحالة الصلبة الآن لنبدأ!`,
-                nav: 'states-section:solid'
-            },
-            {
-                keywords: ['اختبار', 'كويز', 'اسئلة', 'أسئلة', 'امتحان', 'تقييم', 'تحدي', 'quiz'],
-                text: `جاهز لتحدي مستر شريف العلمي؟ 🎓 
-لو ضغطت على زر (ابدأ الكويز) سيبدأ الاختبار فوراً المكون من 3 أسئلة. لقد فتحت لك لوحة الكويز الآن، وريني شطارتك!`,
-                nav: 'quiz-section'
+                grade: 'grade2',
+                keywords: ['كويز 2', 'امتحان 2', 'اسئلة 2', 'اختبار 2', 'تدريب 2', 'كويز تانية', 'كويز تانيه'],
+                text: `جاهز لتحدي مستر مينا في منهج تانية إعدادي؟ 🚀 فتحتلك كويز 2ع التفاعلي، وريني تركيزك وإجاباتك النموذجية!`,
+                nav: 'g2-quiz-section'
             }
         ];
     }
 
+    setGrade(grade) {
+        this.activeGrade = grade;
+        localStorage.setItem('mena_active_grade', grade);
+    }
+
     setApiKey(key) {
-        if (key && key.trim().startsWith('AIzaSy')) {
+        if (key && key.trim().length > 10) {
             this.apiKey = key.trim();
             localStorage.setItem('gemini_api_key', this.apiKey);
             return true;
@@ -139,23 +138,21 @@ class AstroTutorEngine {
         return this.apiKey !== null && this.apiKey.trim() !== '';
     }
 
-    // Main interaction endpoint
     async getResponse(userInput) {
         if (this.isApiKeyActive()) {
             try {
                 return await this.callGeminiAPI(userInput);
             } catch (error) {
-                console.error("Gemini API Error, falling back to local simulation:", error);
+                console.error("Gemini API Error, using local response:", error);
                 return this.getLocalResponse(userInput);
             }
         } else {
-            // Instant 0ms response in local simulation mode
             return this.getLocalResponse(userInput);
         }
     }
 
-    // Call actual Gemini 1.5 Flash API
     async callGeminiAPI(prompt) {
+        const gradeContext = this.activeGrade === 'grade1' ? 'منهج الصف الأول الإعدادي (1ع)' : 'منهج الصف الثاني الإعدادي (2ع)';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
         
         const payload = {
@@ -164,81 +161,68 @@ class AstroTutorEngine {
                     role: "user",
                     parts: [
                         { text: this.systemInstruction },
-                        { text: `سؤال الطالب الحالي: ${prompt}` }
+                        { text: `الطالب حالياً في: ${gradeContext}. سؤال الطالب: ${prompt}` }
                     ]
                 }
             ],
             generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 500,
+                maxOutputTokens: 300,
             }
         };
 
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP Error Status: ${response.status}`);
+            throw new Error(`HTTP Error: ${response.status}`);
         }
 
         const data = await response.json();
-        
         if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const textResponse = data.candidates[0].content.parts[0].text;
-            return this.parseResponse(textResponse);
-        } else {
-            throw new Error("Invalid response structure from Gemini API");
+            return this.parseResponse(data.candidates[0].content.parts[0].text);
         }
+        throw new Error("Invalid structure from Gemini API");
     }
 
-    // Local simulation parsing
     getLocalResponse(input) {
-        const lowercaseInput = input.toLowerCase();
+        const lower = input.toLowerCase();
         
-        for (const item of this.localResponses) {
-            const matched = item.keywords.some(keyword => lowercaseInput.includes(keyword));
-            if (matched) {
-                return {
-                    text: item.text,
-                    nav: item.nav
-                };
-            }
+        // Match response prioritized by active grade
+        const matchedGrade = this.localResponses.find(item => 
+            item.grade === this.activeGrade && item.keywords.some(k => lower.includes(k))
+        );
+
+        if (matchedGrade) {
+            return { text: matchedGrade.text, nav: matchedGrade.nav };
         }
 
-        // Default response if no keywords matched
-        return {
-            text: `سؤال جميل جداً! 🔬 بصفتي معلم العلوم الخاص بك، يسعدني الإجابة على أي سؤال يخص الخلية الحية، أو العناصر الكيميائية، أو حالات المادة وحركة الجزيئات.
-جرب أن تسألني عن:
-- النواة أو الميتوكوندريا في الخلية 🧬
-- عنصر الأكسجين أو الحديد أو الكربون الكيميائي 🧪
-- المادة في حالتها الصلبة والسائلة والغازية 🌡️
-- أو قل لي "ابدأ الكويز" لأختبر معلوماتك! 🚀
+        // General fallback across all keywords
+        const matchedAny = this.localResponses.find(item => 
+            item.keywords.some(k => lower.includes(k))
+        );
 
-أدخل سؤالك أو تحدث بصوتك وسأوجهك للقسم المناسب فوراً!`,
-            nav: null
+        if (matchedAny) {
+            return { text: matchedAny.text, nav: matchedAny.nav };
+        }
+
+        const gradeName = this.activeGrade === 'grade1' ? 'الصف الأول الإعدادي' : 'الصف الثاني الإعدادي';
+        return {
+            text: `سؤال جميل جداً يا بطل! 🔬 أنا مستر مينا جرجس جاهز لشرح أي جزء في منهج ومذكرات ${gradeName}. اسألني عن التجارب، القوانين، أو قل لي "ابدأ الكويز"!`,
+            nav: this.activeGrade === 'grade1' ? 'g1-atom-section:level-k' : 'g2-periodic-section:alkali'
         };
     }
 
-    // Parse navigation tokens from response text
     parseResponse(rawText) {
         const navRegex = /\[NAV:([^\]]+)\]/;
         const match = rawText.match(navRegex);
-        
-        let cleanedText = rawText.replace(navRegex, '').trim();
-        let navCommand = null;
-        
-        if (match && match[1]) {
-            navCommand = match[1];
-        }
-
+        const cleanedText = rawText.replace(navRegex, '').trim();
         return {
             text: cleanedText,
-            nav: navCommand
+            nav: match && match[1] ? match[1] : null
         };
     }
 }

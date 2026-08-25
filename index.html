@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مختبر العلوم التفاعلي | ScienceGuide</title>
+    <title>منصة مستر مينا جرجس للعلوم التفاعلية | Mena Science 3D</title>
     <!-- Google Fonts: Cairo & Tajawal -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,201 +11,277 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=4">
-    <!-- ResponsiveVoice Arabic TTS (works without OS Arabic voice pack) -->
+    <link rel="stylesheet" href="style.css?v=20">
+    <!-- ResponsiveVoice Arabic TTS -->
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
 </head>
 <body>
-    <!-- Background Stars & Labs Simulation -->
+    <!-- Background Stars Simulation -->
     <div class="space-bg">
         <div class="stars"></div>
         <div class="twinkling"></div>
         <div class="nebula"></div>
     </div>
 
+    <!-- Hidden Audio Player for Mr. Mena TTS -->
+    <audio id="tutor-audio-player" style="display:none;"></audio>
+
+    <!-- Top Platform Header -->
+    <header class="main-platform-header glass-panel">
+        <div class="header-branding">
+            <div class="teacher-mini-badge">
+                <img src="assets/mr_mena_1.jpeg" alt="مستر مينا جرجس" class="teacher-avatar-img">
+                <div class="teacher-status-pulse"></div>
+            </div>
+            <div class="brand-titles">
+                <h1>منصة مستر مينا جرجس للعلوم <span>Mena Science 3D</span></h1>
+                <p>المساعد الذكي لمنهج ومذكرات العلوم للمرحلة الإعدادية</p>
+            </div>
+        </div>
+
+        <!-- Grade 1 & Grade 2 Switcher Tabs -->
+        <div class="grade-selector-nav">
+            <button class="grade-tab-btn active-grade" data-grade="grade1" id="tab-grade-1">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <div class="tab-label">
+                    <span class="main-grade-title">الصف الأول الإعدادي</span>
+                    <span class="sub-grade-term">الترم الأول (كتاب الامتحان ومذكرة مستر مينا)</span>
+                </div>
+            </button>
+            <button class="grade-tab-btn" data-grade="grade2" id="tab-grade-2">
+                <i class="fa-solid fa-atom"></i>
+                <div class="tab-label">
+                    <span class="main-grade-title">الصف الثاني الإعدادي</span>
+                    <span class="sub-grade-term">الترم الأول (كتاب الامتحان ومذكرة مستر مينا)</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- System Controls -->
+        <div class="header-controls">
+            <div class="sound-toggle-badge" id="toggle-sound" title="صوت مستر مينا">
+                <i class="fa-solid fa-volume-high"></i>
+                <span id="sound-badge-text">الصوت مفعل</span>
+            </div>
+            <div class="view-toggle-badge" id="toggle-view-mode" title="تبديل طريقة العرض">
+                <i class="fa-solid fa-expand"></i>
+                <span id="view-badge-text">الوضع الكامل</span>
+            </div>
+            <div class="api-toggle-badge" id="test-voice-btn" title="اختبر صوت مستر مينا" style="cursor:pointer;">
+                <i class="fa-solid fa-play"></i>
+                <span>صوت مستر مينا</span>
+            </div>
+            <div class="api-toggle-badge" id="toggle-api-settings" title="إعدادات الـ API والذكاء الاصطناعي" style="cursor:pointer;">
+                <i class="fa-solid fa-gears"></i>
+                <span id="api-badge-text">إعدادات API</span>
+            </div>
+        </div>
+    </header>
+
     <!-- Main App Container: 3 Columns Grid -->
     <div class="hologram-app-container simple-mode">
         
-        <!-- ================= LEFT COLUMN: BIOLOGY & CHEMISTRY ================= -->
+        <!-- ================= LEFT COLUMN: LABS & EXPERIMENTS ================= -->
         <aside class="hologram-column left-column">
             <div class="column-header">
-                <i class="fa-solid fa-dna"></i>
-                <span>مختبر الأحياء والكيمياء</span>
+                <i class="fa-solid fa-microscope text-teal"></i>
+                <span id="left-column-title">مختبر العلوم التفاعلي (1ع)</span>
             </div>
             
             <div class="column-scroll-content">
-                <!-- Section 1: The Cell -->
-                <section id="cell-section" class="edu-section active-highlight">
-                    <div class="section-badge">علم الأحياء</div>
-                    <h3 class="section-title"><i class="fa-solid fa-circle-nodes text-green"></i> الخلية الحية: وحدة البناء</h3>
-                    <p class="section-subtitle">اضغط على النقاط المضيئة داخل مجسم الخلية لاستكشاف عضياتها ووظائفها.</p>
+                
+                <!-- ================= GRADE 1: LAB 1 (المادة والتركيب الذري) ================= -->
+                <div class="grade-content-wrapper active-grade-content" id="grade1-left-content">
                     
-                    <div class="sun-interactive-vertical">
-                        <div class="sun-diagram-box">
-                            <div class="sun-wrapper cell-wrapper">
-                                <div class="sun-glowing-effect cell-glow"></div>
-                                <svg class="sun-svg cell-svg" viewBox="0 0 200 200">
-                                    <!-- Cell Membrane -->
-                                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0, 255, 210, 0.2)" stroke-width="6" class="cell-membrane-orbit"></circle>
-                                    <!-- Cytoplasm (Cell body) -->
-                                    <circle cx="100" cy="100" r="80" fill="url(#cellGrad)" class="cell-body-circle"></circle>
-                                    <!-- Nucleus -->
-                                    <circle cx="100" cy="100" r="28" fill="url(#nucleusGrad)" class="cell-nucleus-circle"></circle>
-                                    <!-- Mitochondria representation -->
-                                    <ellipse cx="60" cy="80" rx="14" ry="7" fill="#ff5100" transform="rotate(-30, 60, 80)"></ellipse>
-                                    
-                                    <defs>
-                                        <radialGradient id="cellGrad" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#00ffd2" stop-opacity="0.3" />
-                                            <stop offset="70%" stop-color="#0a3c36" stop-opacity="0.6" />
-                                            <stop offset="100%" stop-color="#051f1c" stop-opacity="0.9" />
-                                        </radialGradient>
-                                        <radialGradient id="nucleusGrad" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#b026ff" />
-                                            <stop offset="60%" stop-color="#6b0fa3" />
-                                            <stop offset="100%" stop-color="#3d0361" />
-                                        </radialGradient>
-                                    </defs>
-                                </svg>
-                                <!-- Hotspots -->
-                                <button class="hotspot" style="top: 50%; left: 50%;" data-spot="nucleus" title="النواة">
-                                    <span class="pulse-ring"></span>
-                                    <span class="hotspot-dot">1</span>
-                                </button>
-                                <button class="hotspot" style="top: 40%; left: 30%;" data-spot="mitochondria" title="الميتوكوندريا">
-                                    <span class="pulse-ring"></span>
-                                    <span class="hotspot-dot">2</span>
-                                </button>
-                                <button class="hotspot" style="top: 75%; left: 65%;" data-spot="cytoplasm" title="السيتوبلازم">
-                                    <span class="pulse-ring"></span>
-                                    <span class="hotspot-dot">3</span>
-                                </button>
-                            </div>
-                        </div>
+                    <section id="g1-atom-section" class="edu-section active-highlight">
+                        <div class="section-badge badge-grade1">1ع • الوحدة الأولى</div>
+                        <h3 class="section-title"><i class="fa-solid fa-atom text-blue"></i> تركيب الذرة ومستويات الطاقة</h3>
+                        <p class="section-subtitle">اضغط على مستويات الطاقة (K-L-M-N) لمعرفة سعتها الإلكترونية والتوزيع الذري.</p>
                         
-                        <div class="sun-details-card glass-panel" id="sun-info-panel">
-                            <div class="card-placeholder-text">
-                                <i class="fa-solid fa-hand-pointer"></i>
-                                <h4>حدد جزءاً من الخلية (1، 2، 3) لعرض وظيفته الحيوية</h4>
+                        <div class="sun-interactive-vertical">
+                            <div class="sun-diagram-box">
+                                <div class="sun-wrapper cell-wrapper">
+                                    <div class="sun-glowing-effect atom-glow"></div>
+                                    <svg class="sun-svg atom-svg" viewBox="0 0 220 220">
+                                        <circle cx="110" cy="110" r="100" fill="none" stroke="rgba(0, 255, 210, 0.2)" stroke-width="2" stroke-dasharray="4"></circle>
+                                        <circle cx="110" cy="110" r="78" fill="none" stroke="rgba(0, 200, 255, 0.3)" stroke-width="2" stroke-dasharray="4"></circle>
+                                        <circle cx="110" cy="110" r="56" fill="none" stroke="rgba(180, 50, 255, 0.4)" stroke-width="2" stroke-dasharray="4"></circle>
+                                        <circle cx="110" cy="110" r="36" fill="none" stroke="rgba(255, 180, 0, 0.5)" stroke-width="2" stroke-dasharray="4"></circle>
+                                        
+                                        <circle cx="110" cy="110" r="22" fill="url(#atomNucleusGrad)" class="cell-nucleus-circle"></circle>
+                                        <text x="110" y="114" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">+P / ±N</text>
+                                        
+                                        <defs>
+                                            <radialGradient id="atomNucleusGrad" cx="50%" cy="50%" r="50%">
+                                                <stop offset="0%" stop-color="#ff3366" />
+                                                <stop offset="60%" stop-color="#990033" />
+                                                <stop offset="100%" stop-color="#4d001a" />
+                                            </radialGradient>
+                                        </defs>
+                                    </svg>
+                                    <button class="hotspot" style="top: 50%; left: 50%;" data-spot="nucleus" title="النواة الموجبة">
+                                        <span class="pulse-ring"></span>
+                                        <span class="hotspot-dot">النواة</span>
+                                    </button>
+                                    <button class="hotspot" style="top: 50%; left: 66%;" data-spot="level-k" title="المستوى K">
+                                        <span class="pulse-ring"></span>
+                                        <span class="hotspot-dot">K (2)</span>
+                                    </button>
+                                    <button class="hotspot" style="top: 50%; left: 76%;" data-spot="level-l" title="المستوى L">
+                                        <span class="pulse-ring"></span>
+                                        <span class="hotspot-dot">L (8)</span>
+                                    </button>
+                                    <button class="hotspot" style="top: 50%; left: 86%;" data-spot="level-m" title="المستوى M">
+                                        <span class="pulse-ring"></span>
+                                        <span class="hotspot-dot">M (18)</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="card-content hidden" id="sun-spot-content">
-                                <h4 id="sun-spot-title" class="text-neon-yellow">اسم العضية</h4>
-                                <p id="sun-spot-text">الشرح والتفاصيل...</p>
-                                <div class="spot-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-label">الأهمية:</span>
-                                        <span class="stat-value" id="sun-spot-temp">---</span>
+                            
+                            <div class="sun-details-card glass-panel" id="atom-info-panel">
+                                <div class="card-placeholder-text" id="atom-placeholder">
+                                    <i class="fa-solid fa-hand-pointer"></i>
+                                    <h4>اضغط على النواة أو مستويات الطاقة (K, L, M) لشرح التوزيع الإلكتروني</h4>
+                                </div>
+                                <div class="card-content hidden" id="atom-spot-content">
+                                    <h4 id="atom-spot-title" class="text-neon-yellow">المستوى K</h4>
+                                    <p id="atom-spot-text">أقرب المستويات إلى النواة، أقلها طاقة، ويتشبع بـ 2 إلكترون طبقاً للقاعدة (2n²).</p>
+                                    <div class="spot-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-label">القاعدة:</span>
+                                            <span class="stat-value" id="atom-spot-rule">2n² = 2 × (1)² = 2e⁻</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Section 2: Chemistry Elements -->
-                <section id="elements-section" class="edu-section">
-                    <div class="section-badge">علم الكيمياء</div>
-                    <h3 class="section-title"><i class="fa-solid fa-flask-vial text-blue"></i> العناصر والمواد الكيميائية</h3>
-                    <p class="section-subtitle">اضغط على العنصر لمشاهدة عدده الذري، كتلته، وحقائقه الفريدة.</p>
+                    <section id="g1-density-section" class="edu-section">
+                        <div class="section-badge badge-grade1">1ع • معمل الكثافة</div>
+                        <h3 class="section-title"><i class="fa-solid fa-scale-balanced text-teal"></i> الكثافة والطفو والغوص في الماء</h3>
+                        <p class="section-subtitle">اختر المادة لمعرفة كثافتها وسلوكها في الماء (كثافة الماء = 1 جم/سم³).</p>
+                        
+                        <div class="planets-grid-compact">
+                            <div class="planet-card-mini glass-panel active-card" data-density="wood">
+                                <i class="fa-solid fa-tree text-green"></i>
+                                <span>الخشب (0.6)</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-density="cork">
+                                <i class="fa-solid fa-wine-bottle text-yellow"></i>
+                                <span>الفلين (0.2)</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-density="iron">
+                                <i class="fa-solid fa-cube text-blue"></i>
+                                <span>الحديد (7.8)</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-density="gold">
+                                <i class="fa-solid fa-gem text-purple"></i>
+                                <span>الذهب (19.3)</span>
+                            </div>
+                        </div>
+
+                        <div class="planet-explorer-panel glass-panel">
+                            <div class="explorer-header">
+                                <h4 id="density-item-name">قطعة الخشب</h4>
+                                <p id="density-item-desc">كثافة الخشب (0.6 جم/سم³) أقل من كثافة الماء فتطفو على السطح.</p>
+                            </div>
+                            <div class="explorer-body-vertical">
+                                <div class="progress-bar-group">
+                                    <div class="bar-header">
+                                        <span>الكثافة (ث = ك ÷ ح)</span>
+                                        <span id="density-val">0.6 جم/سم³</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill fill-neon-green" id="density-bar" style="width: 30%;"></div>
+                                    </div>
+                                </div>
+                                <div class="explorer-facts">
+                                    <ul id="density-facts-list">
+                                        <li>تطفو المواد الأقل كثافة من الماء (مثل الخشب والفلين والزيت) فوق سطحه.</li>
+                                        <li>تغوص المواد الأكبر كثافة من الماء (مثل الحديد والنحاس والرصاص) في القاع.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ================= GRADE 2: LAB 1 (الجدول الدوري وخواص الماء) ================= -->
+                <div class="grade-content-wrapper hidden" id="grade2-left-content">
                     
-                    <div class="planets-grid-compact">
-                        <div class="planet-card-mini glass-panel" data-planet="hydrogen">
-                            <div class="planet-sphere-mini hydrogen-img"></div>
-                            <span>هيدروجين</span>
+                    <section id="g2-periodic-section" class="edu-section active-highlight">
+                        <div class="section-badge badge-grade2">2ع • الوحدة الأولى</div>
+                        <h3 class="section-title"><i class="fa-solid fa-table-cells text-blue"></i> الجدول الدوري والمجموعات الرئيسية</h3>
+                        <p class="section-subtitle">اضغط على المجموعة لاستكشاف فلزات الأقلاء (1A)، الهالوجينات (7A)، والغازات الخاملة.</p>
+                        
+                        <div class="planets-grid-compact">
+                            <div class="planet-card-mini glass-panel active-card" data-group="alkali">
+                                <div class="planet-sphere-mini alkali-img"></div>
+                                <span>الأقلاء 1A</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-group="halogens">
+                                <div class="planet-sphere-mini halogen-img"></div>
+                                <span>الهالوجينات 7A</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-group="noble">
+                                <div class="planet-sphere-mini noble-img"></div>
+                                <span>الغازات الخاملة</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-group="water">
+                                <div class="planet-sphere-mini water-img"></div>
+                                <span>مركب الماء H₂O</span>
+                            </div>
                         </div>
-                        <div class="planet-card-mini glass-panel" data-planet="oxygen">
-                            <div class="planet-sphere-mini oxygen-img"></div>
-                            <span>أكسجين</span>
-                        </div>
-                        <div class="planet-card-mini glass-panel active-card" data-planet="carbon">
-                            <div class="planet-sphere-mini carbon-img"></div>
-                            <span>كربون</span>
-                        </div>
-                        <div class="planet-card-mini glass-panel" data-planet="iron">
-                            <div class="planet-sphere-mini iron-img"></div>
-                            <span>حديد</span>
-                        </div>
-                    </div>
 
-                    <!-- Elements detail explorer -->
-                    <div class="planet-explorer-panel glass-panel" id="planet-explorer">
-                        <div class="explorer-header">
-                            <h4 id="explorer-planet-name">عنصر الكربون</h4>
-                            <p id="explorer-planet-desc">العنصر الأساسي لجميع أشكال الحياة العضوية على وجه الأرض.</p>
-                        </div>
-                        <div class="explorer-body-vertical">
-                            <div class="explorer-chart-container">
+                        <div class="planet-explorer-panel glass-panel">
+                            <div class="explorer-header">
+                                <h4 id="group-explorer-name">فلزات الأقلاء (المجموعة 1A)</h4>
+                                <p id="group-explorer-desc">فلزات أحادية التكافؤ، نشطة جداً كيميائياً، وتحفظ تحت سطح الكيروسين.</p>
+                            </div>
+                            <div class="explorer-body-vertical">
                                 <div class="progress-bar-group">
                                     <div class="bar-header">
-                                        <span>العدد الذري (البروتونات)</span>
-                                        <span id="gravity-val">6</span>
+                                        <span>التكافؤ والنشاط الكيميائي</span>
+                                        <span id="group-activity-val">أحادي (+1) - عالي جداً</span>
                                     </div>
                                     <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill fill-neon-blue" id="gravity-bar" style="width: 30%;"></div>
+                                        <div class="progress-bar-fill fill-neon-yellow" id="group-activity-bar" style="width: 90%;"></div>
                                     </div>
                                 </div>
-                                <div class="progress-bar-group">
-                                    <div class="bar-header">
-                                        <span>الكتلة الذرية (جرام/مول)</span>
-                                        <span id="distance-val">12.011</span>
-                                    </div>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill fill-neon-green" id="distance-bar" style="width: 45%;"></div>
-                                    </div>
-                                </div>
-                                <div class="progress-bar-group">
-                                    <div class="bar-header">
-                                        <span>درجة الغليان (مئوية)</span>
-                                        <span id="diameter-val">4,827°م</span>
-                                    </div>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill fill-neon-yellow" id="diameter-bar" style="width: 80%;"></div>
-                                    </div>
+                                <div class="explorer-facts">
+                                    <ul id="group-facts-list">
+                                        <li>تتفاعل مع الماء بشدة ويتصاعد غاز الهيدروجين الذي يشتعل بفرقعة.</li>
+                                        <li>يزداد نشاطها الكيميائي بزيادة الحجم الذري، والأنشط هو السيزيوم (Cs).</li>
+                                    </ul>
                                 </div>
                             </div>
-                            <div class="explorer-facts">
-                                <ul id="planet-facts-list">
-                                    <li>يشكل أساس كيمياء الحياة العضوية ويوجد في الفحم والألماس.</li>
-                                </ul>
+                        </div>
+                    </section>
+
+                    <section id="g2-water-section" class="edu-section">
+                        <div class="section-badge badge-grade2">2ع • شذوذ خواص الماء</div>
+                        <h3 class="section-title"><i class="fa-solid fa-droplet text-teal"></i> شذوذ الماء والروابط الهيدروجينية</h3>
+                        <p class="section-subtitle">الروابط الهيدروجينية بين جزيئات الماء هي سر ارتفاع درجتي غليانه وانصهاره وشذوذ كثافته.</p>
+                        
+                        <div class="gas-interactive-vertical">
+                            <div class="sun-details-card glass-panel" style="padding: 15px;">
+                                <h4 class="text-neon-green"><i class="fa-solid fa-snowflake"></i> شذوذ كثافة الماء عند التجمد</h4>
+                                <p style="font-size: 0.88rem; line-height: 1.6; margin-top: 8px;">
+                                    عند انخفاض درجة حرارة الماء عن <strong>4°م</strong>، تتجمع الجزيئات بروابط هيدروجينية مكونة بلورات ثلج سداسية الشكل كبيرة الحجم بينها فراغات، <strong>فيزداد الحجم وتقل الكثافة</strong> ليطفو الثلج على السطح وتحيا الكائنات المائية في القاع!
+                                </p>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
+
             </div>
         </aside>
 
-        <!-- ================= CENTER COLUMN: THE TEACHER CHARACTER & CHAT ================= -->
+        <!-- ================= CENTER COLUMN: MR. MENA 3D AVATAR & CHAT ================= -->
         <main class="hologram-column center-column">
             
-            <!-- Logo / Top Title -->
-            <div class="center-app-header">
-                <div class="cosmo-logo">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                    <h2>مستشار العلوم الذكي <span>ScienceTutor</span></h2>
-                </div>
-                <div class="header-controls">
-                    <div class="sound-toggle-badge" id="toggle-sound" title="صوت مستر شريف">
-                        <i class="fa-solid fa-volume-high"></i>
-                        <span id="sound-badge-text">الصوت مفعل</span>
-                    </div>
-                    <div class="view-toggle-badge" id="toggle-view-mode" title="تبديل طريقة العرض">
-                        <i class="fa-solid fa-expand"></i>
-                        <span id="view-badge-text">الوضع الكامل</span>
-                    </div>
-                    <div class="api-toggle-badge" id="test-voice-btn" title="اختبر الصوت العربي" style="cursor:pointer;">
-                        <i class="fa-solid fa-play"></i>
-                        <span>اختبر الصوت</span>
-                    </div>
-                    <div class="api-toggle-badge" id="toggle-api-settings" title="إعدادات API" style="cursor:pointer;">
-                        <i class="fa-solid fa-gears"></i>
-                        <span id="api-badge-text">إعدادات API</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Floating Character Arena -->
             <div class="character-arena">
-                <!-- Holo Pedestal -->
                 <div class="holo-pedestal">
                     <div class="holo-light"></div>
                     <div class="holo-rings">
@@ -214,34 +290,30 @@
                     </div>
                 </div>
 
-                <!-- Animated CSS Robot Character (ScienceTutor) -->
-                <div class="astrotutor-character">
-                    <div class="robot-head teacher-head">
-                        <div class="robot-ears"></div>
-                        <!-- Glasses Overlay to make him look like a teacher -->
-                        <div class="teacher-glasses">
+                <div class="astrotutor-character mena-avatar">
+                    <div class="robot-head teacher-head mena-head">
+                        <div class="mena-hair"></div>
+                        <div class="teacher-glasses mena-glasses">
                             <span class="lens"></span>
                             <span class="bridge"></span>
                             <span class="lens"></span>
                         </div>
-                        <div class="robot-face">
-                            <div class="robot-eyes">
+                        <div class="robot-face mena-face">
+                            <div class="robot-eyes mena-eyes">
                                 <span class="eye eye-left"></span>
                                 <span class="eye eye-right"></span>
                             </div>
+                            <div class="mena-beard"></div>
                             <div class="robot-mouth smile"></div>
                         </div>
-                        <div class="robot-antenna">
-                            <span class="antenna-tip"></span>
-                        </div>
+                        <div class="hologram-crown-badge">Mr. Mena</div>
                     </div>
-                    <div class="robot-body teacher-body">
-                        <!-- Lab coat tie representation -->
-                        <div class="lab-coat-tie"></div>
-                        <div class="robot-screen">
+                    <div class="robot-body teacher-body mena-body">
+                        <div class="lab-coat-collar"></div>
+                        <div class="robot-screen mena-screen">
                             <div class="sine-wave"></div>
                         </div>
-                        <div class="robot-joints"></div>
+                        <div class="mena-name-tag">أ/ مينا جرجس</div>
                     </div>
                     <div class="robot-hands">
                         <div class="hand hand-left"></div>
@@ -251,39 +323,42 @@
                 </div>
             </div>
 
-            <!-- Dynamic Chat Bubble Above character -->
             <div class="central-chat-area">
                 <div class="tutor-chat-bubble glass-panel" id="tutor-bubble">
                     <div class="bubble-header">
-                        <span class="tutor-title"><i class="fa-solid fa-chalkboard-user"></i> مستر شريف (معلم العلوم):</span>
+                        <span class="tutor-title"><i class="fa-solid fa-chalkboard-user"></i> مستر مينا جرجس (معلم العلوم):</span>
                         <button class="clear-chat-btn" id="clear-chat-btn" title="مسح السجل"><i class="fa-solid fa-rotate-left"></i></button>
                     </div>
                     <div class="bubble-body" id="chat-messages-container">
                         <div id="latest-tutor-message" class="animate-fade-in">
-                            <p>مرحباً بك يا بطل في مختبر العلوم التفاعلي! 🧪🧬</p>
-                            <p>أنا <strong>مستر شريف</strong> معلم العلوم الخاص بك. سأقوم بشرح الدروس وتوجيه الصفحة معك. </p>
-                            <p>اضغط على <strong>زر المايك 🎤 وتحدث بصوتك مباشرة</strong> لتسألني، أو جرب كتابة: <strong>"اشرح لي الخلية الحية"</strong>، <strong>"كلمني عن عنصر الأكسجين"</strong>، أو <strong>"عايز أحل الكويز"</strong>.</p>
+                            <p>أهلاً بيك يا بطل في منصتنا التفاعلية! 🔬🧪</p>
+                            <p>أنا <strong>مستر مينا جرجس</strong>، هشرح معاك كل تجارب ودروس العلوم لـ <strong id="welcome-grade-text">الصف الأول الإعدادي</strong> بأسلوبنا الممتع من واقع المذكرات وكتاب الامتحان!</p>
+                            <p>اضغط على <strong>زر المايك 🎤 وتحدث بصوتك</strong>، أو اضغط على أي زر لشرح التجارب فوراً.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Guidance Navigation Banner -->
             <div class="guidance-banner-center hidden" id="guidance-banner">
                 <i class="fa-solid fa-compass-drafting spinner-icon"></i>
-                <span id="guidance-text">يقوم مستر شريف بتوجيه الصفحة وتجهيز الشرح...</span>
+                <span id="guidance-text">يقوم مستر مينا بتوجيه الصفحة وتجهيز الشرح...</span>
             </div>
 
-            <!-- Prompt recommendations chips -->
-            <div class="quick-prompts-center">
-                <button class="prompt-chip" data-prompt="اشرح لي عضيات الخلية الحية ووظائفها">🧬 شرح الخلية</button>
-                <button class="prompt-chip" data-prompt="قارن بين الأكسجين والحديد كعناصر كيميائية">🧪 الأكسجين والحديد</button>
-                <button class="prompt-chip" data-prompt="ما هي الفروقات بين الحالة الصلبة والسائلة والغازية للمادة؟">🌡️ حالات المادة</button>
+            <div class="quick-prompts-center" id="g1-prompts">
+                <button class="prompt-chip" data-prompt="اشرح لي التركيب الذري ومستويات الطاقة للذرة">⚛️ تركيب الذرة ومستويات الطاقة</button>
+                <button class="prompt-chip" data-prompt="اشرح لي تجربة الكثافة وقانون الطفو والغوص">⚖️ تجربة الكثافة والطفو</button>
+                <button class="prompt-chip" data-prompt="ما هي تحولات الطاقة في البندول البسيط؟">⚡ تحولات طاقة البندول</button>
+                <button class="prompt-chip" data-prompt="اشرح لي التكيف وتنوع الكائنات الحية">🦅 التكيف في الطيور والنباتات</button>
             </div>
 
-            <!-- Unified input area with MIC button at the bottom -->
+            <div class="quick-prompts-center hidden" id="g2-prompts">
+                <button class="prompt-chip" data-prompt="اشرح لي تدرج خواص الجدول الدوري وفلزات الأقلاء والهالوجينات">📊 الجدول الدوري والأقلاء</button>
+                <button class="prompt-chip" data-prompt="اشرح لي طبقات الغلاف الجوي وأهمية طبقة الأوزون">🌍 طبقات الغلاف الجوي والأوزون</button>
+                <button class="prompt-chip" data-prompt="ما هي أنواع الحفريات وشروط تكون حفرية كائن كامل؟">🦖 أنواع الحفريات والانقراض</button>
+                <button class="prompt-chip" data-prompt="اشرح لي شذوذ خواص الماء والروابط الهيدروجينية">💧 شذوذ كثافة وخواص الماء</button>
+            </div>
+
             <div class="center-input-console glass-panel">
-                <!-- Microphone Voice Recognition Button -->
                 <button id="mic-btn" class="mic-btn" title="تحدث بصوتك (تسجيل)">
                     <i class="fa-solid fa-microphone"></i>
                 </button>
@@ -293,138 +368,189 @@
                 </button>
             </div>
 
-            <!-- API Configuration Modal / Panel Overlay -->
-            <div class="api-settings-overlay hidden" id="api-settings-panel">
-                <div class="api-modal-card glass-panel animate-fade-in">
-                    <div class="modal-header">
-                        <h4><i class="fa-solid fa-gears"></i> إعدادات معالج الذكاء الاصطناعي</h4>
-                        <button class="close-modal-btn" id="close-settings-btn"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>بشكل افتراضي، يعمل المساعد في وضع المحاكاة الذكية محلياً. أدخل مفتاحك لربطه بالذكاء الاصطناعي المباشر من Google:</p>
-                        <div class="input-group">
-                            <input type="password" id="gemini-key-input" placeholder="أدخل مفتاح Gemini API هنا...">
-                            <button id="save-key-btn">حفظ وتفعيل</button>
-                        </div>
-                        <div class="api-status">
-                            <span class="status-dot simulated"></span>
-                            <span id="status-text">وضع المحاكاة النشط</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </main>
 
-        <!-- ================= RIGHT COLUMN: PHYSICS & QUIZ ================= -->
+        <!-- ================= RIGHT COLUMN: PHYSICS, GEOLOGY & QUIZZES ================= -->
         <aside class="hologram-column right-column">
             <div class="column-header">
-                <i class="fa-solid fa-atom"></i>
-                <span>مختبر الفيزياء والتقييم</span>
+                <i class="fa-solid fa-flask-vial text-purple"></i>
+                <span id="right-column-title">مختبر الفيزياء والكويز (1ع)</span>
             </div>
 
             <div class="column-scroll-content">
-                <!-- Section 3: States of Matter -->
-                <section id="states-section" class="edu-section">
-                    <div class="section-badge">علم الفيزياء</div>
-                    <h3 class="section-title"><i class="fa-solid fa-temperature-empty text-purple"></i> حالات المادة وحركة الجزيئات</h3>
-                    <p class="section-subtitle">اضغط على حالة المادة لمشاهدة سلوك جزيئاتها الذري تحت تأثير الحرارة.</p>
+                
+                <!-- ================= GRADE 1: RIGHT CONTENT ================= -->
+                <div class="grade-content-wrapper active-grade-content" id="grade1-right-content">
                     
-                    <div class="gas-interactive-vertical">
-                        <div class="orbit-simulation-box glass-panel">
-                            <!-- Molecular particles simulation box -->
-                            <div class="particles-simulation" id="particles-container">
-                                <!-- Particles generated dynamically via JS to represent solid, liquid, gas -->
+                    <section id="g1-energy-section" class="edu-section">
+                        <div class="section-badge badge-grade1">1ع • الوحدة الثانية</div>
+                        <h3 class="section-title"><i class="fa-solid fa-bolt text-yellow"></i> تحولات الطاقة والبندول البسيط</h3>
+                        <p class="section-subtitle">تبادل طاقتي الوضع والحركة (الطاقة الميكانيكية = طاقة الوضع + طاقة الحركة = مقدار ثابت).</p>
+                        
+                        <div class="gas-interactive-vertical">
+                            <div class="orbit-simulation-box glass-panel">
+                                <div class="pendulum-container" id="pendulum-box">
+                                    <div class="pendulum-string" id="pendulum-rod">
+                                        <div class="pendulum-bob"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gas-details-panel glass-panel">
+                                <div class="states-buttons">
+                                    <button class="energy-btn active-state" data-pendulum="highest">أعلى نقطة (وضع قصوى)</button>
+                                    <button class="energy-btn" data-pendulum="middle">موضع السكون (سرعة قصوى)</button>
+                                </div>
+                                <h4 id="energy-state-title" style="margin-top:12px;">عند أقصى إزاحة</h4>
+                                <p id="energy-state-desc">تكون طاقة الوضع مساوية للطاقة الميكانيكية وطاقة الحركة تساوي صفر لأن السرعة تصبح صفراً.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="g1-quiz-section" class="edu-section">
+                        <div class="section-badge badge-grade1">1ع • بنك أسئلة مستر مينا</div>
+                        <h3 class="section-title"><i class="fa-solid fa-trophy text-teal"></i> كويز علوم 1ع الشامل</h3>
+                        <p class="section-subtitle">أسئلة وتدريبات تفاعلية من مذكرة مستر مينا وامتحانات كتاب الامتحان 1ع.</p>
+                        
+                        <div class="quiz-container-compact glass-panel">
+                            <div id="g1-quiz-intro">
+                                <h4>تحدي أوائل الطلبة للصف الأول الإعدادي 🚀</h4>
+                                <button class="action-btn-compact" id="g1-start-quiz-btn">ابدأ كويز 1ع 📝</button>
+                            </div>
+
+                            <div id="g1-quiz-play" class="hidden">
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="g1-quiz-progress" style="width: 0%;"></div>
+                                </div>
+                                <div class="question-header">
+                                    <span class="question-number" id="g1-q-num">السؤال 1 من 4</span>
+                                    <h4 id="g1-q-text">السؤال يظهر هنا...</h4>
+                                </div>
+                                <div class="answers-grid-vertical" id="g1-answers-grid"></div>
+                            </div>
+
+                            <div id="g1-quiz-result" class="hidden">
+                                <i class="fa-solid fa-trophy trophy-icon-mini"></i>
+                                <h4 id="g1-res-title">رائع جداً!</h4>
+                                <p id="g1-res-text">لقد حصلت على الدرجة النهائية.</p>
+                                <div class="result-actions-vertical">
+                                    <button class="action-btn-compact btn-secondary" id="g1-restart-btn">إعادة الاختبار <i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ================= GRADE 2: RIGHT CONTENT ================= -->
+                <div class="grade-content-wrapper hidden" id="grade2-right-content">
+                    
+                    <section id="g2-atmosphere-section" class="edu-section">
+                        <div class="section-badge badge-grade2">2ع • الوحدة الثانية</div>
+                        <h3 class="section-title"><i class="fa-solid fa-cloud-sun text-yellow"></i> طبقات الغلاف الجوي والأوزون</h3>
+                        <p class="section-subtitle">اضغط على الطبقة لمعرفة خصائصها ودرجة حرارتها والضغط الجوي بها.</p>
+                        
+                        <div class="planets-grid-compact">
+                            <div class="planet-card-mini glass-panel active-card" data-layer="troposphere">
+                                <i class="fa-solid fa-cloud-rain text-blue"></i>
+                                <span>التروبوسفير</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-layer="stratosphere">
+                                <i class="fa-solid fa-plane text-teal"></i>
+                                <span>الستراتوسفير (الأوزون)</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-layer="mesosphere">
+                                <i class="fa-solid fa-meteor text-purple"></i>
+                                <span>الميزوسفير (الشهب)</span>
+                            </div>
+                            <div class="planet-card-mini glass-panel" data-layer="thermosphere">
+                                <i class="fa-solid fa-satellite text-yellow"></i>
+                                <span>الثرموسفير (الحرارية)</span>
                             </div>
                         </div>
 
-                        <div class="gas-details-panel glass-panel" id="gas-details">
-                            <div class="states-buttons">
-                                <button class="state-btn active-state" data-state="solid">الصلبة</button>
-                                <button class="state-btn" data-state="liquid">السائلة</button>
-                                <button class="state-btn" data-state="gas">الغازية</button>
+                        <div class="planet-explorer-panel glass-panel">
+                            <div class="explorer-header">
+                                <h4 id="layer-name">طبقة التروبوسفير (طبقة الطقس)</h4>
+                                <p id="layer-desc">تمتد حتى 13 كم، تحدث بها كافة الظواهر الجوية وتحتوي على 75% من كتلة الهواء و99% من بخار الماء.</p>
                             </div>
-                            <h4 id="gas-planet-title" style="margin-top:12px;">الحالة الصلبة</h4>
-                            <p id="gas-planet-desc">تكون جزيئات المادة متقاربة جداً ومتراصة بقوة، وتتحرك حركة اهتزازية بسيطة في مكانها دون الانتقال.</p>
-                            <div class="gas-visuals">
-                                <div class="gas-gas-indicator">
-                                    <div class="gas-tags">
-                                        <span class="gas-tag" id="state-energy-tag">طاقة حركية منخفضة</span>
+                            <div class="explorer-body-vertical">
+                                <div class="progress-bar-group">
+                                    <div class="bar-header">
+                                        <span>درجة الحرارة عند القمة</span>
+                                        <span id="layer-temp-val">-60°م</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill fill-neon-blue" id="layer-temp-bar" style="width: 25%;"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Section 4: Science Quiz -->
-                <section id="quiz-section" class="edu-section">
-                    <div class="section-badge">مختبر المعرفة</div>
-                    <h3 class="section-title"><i class="fa-solid fa-flask text-teal"></i> كويز العلوم التفاعلي</h3>
-                    <p class="section-subtitle">أجب عن الأسئلة واكسب تقييم مستر شريف الممتاز في سجل الصف الدراسي.</p>
-                    
-                    <div class="quiz-container-compact glass-panel">
-                        <div id="quiz-intro">
-                            <h4>هل أنت جاهز لتحدي مستر شريف العلمي؟</h4>
-                            <button class="action-btn-compact" id="start-quiz-btn">ابدأ كويز العلوم 🚀</button>
-                        </div>
+                    <section id="g2-quiz-section" class="edu-section">
+                        <div class="section-badge badge-grade2">2ع • بنك أسئلة مستر مينا</div>
+                        <h3 class="section-title"><i class="fa-solid fa-trophy text-teal"></i> كويز علوم 2ع الشامل</h3>
+                        <p class="section-subtitle">أسئلة وتدريبات تفاعلية من مذكرة مستر مينا وامتحانات كتاب الامتحان 2ع.</p>
+                        
+                        <div class="quiz-container-compact glass-panel">
+                            <div id="g2-quiz-intro">
+                                <h4>تحدي أوائل الطلبة للصف الثاني الإعدادي 🚀</h4>
+                                <button class="action-btn-compact" id="g2-start-quiz-btn">ابدأ كويز 2ع 📝</button>
+                            </div>
 
-                        <div id="quiz-play" class="hidden">
-                            <div class="quiz-progress-bar">
-                                <div class="quiz-progress-fill" id="quiz-progress-fill" style="width: 0%;"></div>
+                            <div id="g2-quiz-play" class="hidden">
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="g2-quiz-progress" style="width: 0%;"></div>
+                                </div>
+                                <div class="question-header">
+                                    <span class="question-number" id="g2-q-num">السؤال 1 من 4</span>
+                                    <h4 id="g2-q-text">السؤال يظهر هنا...</h4>
+                                </div>
+                                <div class="answers-grid-vertical" id="g2-answers-grid"></div>
                             </div>
-                            <div class="question-header">
-                                <span class="question-number" id="question-num">السؤال 1 من 3</span>
-                                <h4 id="question-text">السؤال يظهر هنا...</h4>
-                            </div>
-                            <div class="answers-grid-vertical" id="answers-grid">
-                                <!-- Answer buttons dynamic -->
-                            </div>
-                        </div>
 
-                        <div id="quiz-result" class="hidden">
-                            <i class="fa-solid fa-trophy trophy-icon-mini"></i>
-                            <h4 id="result-title">رائع جداً!</h4>
-                            <p id="result-text">لقد حصلت على درجة 3/3.</p>
-                            <div class="result-actions-vertical">
-                                <button class="action-btn-compact btn-secondary" id="restart-quiz-btn">إعادة الاختبار <i class="fa-solid fa-rotate-right"></i></button>
-                                <button class="action-btn-compact" id="ask-ai-result-btn">اسأل مستر شريف عن تقييمك</button>
+                            <div id="g2-quiz-result" class="hidden">
+                                <i class="fa-solid fa-trophy trophy-icon-mini"></i>
+                                <h4 id="g2-res-title">رائع جداً!</h4>
+                                <p id="g2-res-text">لقد حصلت على الدرجة النهائية.</p>
+                                <div class="result-actions-vertical">
+                                    <button class="action-btn-compact btn-secondary" id="g2-restart-btn">إعادة الاختبار <i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
+
             </div>
         </aside>
 
     </div>
 
-    <!-- Notification Toast -->
     <div class="toast hidden" id="toast">
         <i class="fa-solid fa-info-circle toast-icon"></i>
         <span class="toast-message" id="toast-message">رسالة التنبيه</span>
     </div>
 
-    <!-- API Settings Modal -->
     <div class="modal-overlay hidden" id="api-settings-modal">
         <div class="modal-card glass-panel">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-gears text-teal"></i> إعدادات الذكاء الاصطناعي والصوت</h3>
+                <h3><i class="fa-solid fa-gears text-teal"></i> إعدادات الذكاء الاصطناعي والصوت المخصص</h3>
                 <button class="close-modal-btn" id="close-api-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="gemini-api-key-input"><i class="fa-solid fa-key text-teal"></i> مفتاح Gemini API (للذكاء الاصطناعي):</label>
+                    <label for="gemini-api-key-input"><i class="fa-solid fa-key text-teal"></i> مفتاح Gemini API (للإجابة الذكية من المذكرات):</label>
                     <input type="password" id="gemini-api-key-input" placeholder="ألصق مفتاح Gemini AI API..." class="modal-input">
-                    <span class="input-hint">يستخدم لتوليد إجابات ذكاء اصطناعي تفاعلية مع مستر شريف.</span>
+                    <span class="input-hint">يستخدم للإجابة المباشرة على أسئلة الطلاب بأسلوب مستر مينا جرجس.</span>
                 </div>
                 <div class="form-group" style="margin-top: 15px;">
-                    <label for="elevenlabs-api-key-input"><i class="fa-solid fa-microphone text-teal"></i> مفتاح ElevenLabs API Key (للصوت البشري):</label>
-                    <input type="password" id="elevenlabs-api-key-input" placeholder="ألصق مفتاح ElevenLabs API Key..." class="modal-input">
-                    <span class="input-hint">يمنح مستر شريف صوتاً بشرياً سينمائياً فائق الجودة والواقعية باللغة العربية!</span>
+                    <label for="elevenlabs-api-key-input"><i class="fa-solid fa-microphone text-teal"></i> مفتاح ElevenLabs API Key (لاستنساخ صوت أستاذ مينا):</label>
+                    <input type="password" id="elevenlabs-api-key-input" placeholder="ألصق مفتاح ElevenLabs API..." class="modal-input">
+                    <span class="input-hint">يقوم بربط الصوت المستنسخ الحقيقي لأستاذ مينا من ملف التسجيل الصوتي.</span>
                 </div>
                 <div class="form-group" style="margin-top: 15px;">
-                    <label for="elevenlabs-voice-id-input"><i class="fa-solid fa-id-badge text-teal"></i> معرف الصوت Voice ID (اختياري):</label>
-                    <input type="text" id="elevenlabs-voice-id-input" placeholder="21m00Tcm4TlvDq8ikWAM" value="21m00Tcm4TlvDq8ikWAM" class="modal-input">
+                    <label for="elevenlabs-voice-id-input"><i class="fa-solid fa-id-badge text-teal"></i> معرف الصوت Voice ID لمستر مينا:</label>
+                    <input type="text" id="elevenlabs-voice-id-input" placeholder="Voice ID المستنسخ" value="" class="modal-input">
                 </div>
             </div>
             <div class="modal-footer" style="margin-top: 20px; display: flex; justify-content: flex-end;">
@@ -433,8 +559,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="ai-engine.js?v=37"></script>
-    <script src="app.js?v=37"></script>
+    <script src="ai-engine.js?v=40"></script>
+    <script src="app.js?v=40"></script>
 </body>
 </html>
