@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة العمل التنفيذية | سيستم مستر مينا جرجس للعلوم 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #070e18;
+            --bg-card: rgba(15, 30, 48, 0.85);
+            --bg-glass: rgba(20, 42, 68, 0.7);
+            --border-glass: rgba(0, 242, 254, 0.3);
+            --neon-cyan: #00f2fe;
+            --neon-green: #00ffd2;
+            --neon-yellow: #ffd200;
+            --neon-purple: #b026ff;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --grade1-color: #00ffd2;
+            --grade2-color: #ffd200;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(176, 38, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #0a192b 0%, #050b14 100%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .plan-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 28px;
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--neon-cyan);
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .brand-text h1 span {
+            color: var(--neon-cyan);
+        }
+
+        .brand-text p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 12px;
+        }
+
+        .badge-live {
+            background: rgba(0, 255, 210, 0.15);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-live::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: pulseDot 1.5s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* Navigation Quick Jump */
+        .quick-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .quick-nav a {
+            text-decoration: none;
+            background: rgba(20, 42, 68, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+
+        .quick-nav a:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Grid Layout */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 900px) {
+            .plan-grid { grid-template-columns: 1fr; }
+        }
+
+        .plan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .plan-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 12px 40px rgba(0, 242, 254, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .icon-gfx { background: rgba(0, 255, 210, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .icon-3d { background: rgba(176, 38, 255, 0.15); color: var(--neon-purple); border: 1px solid var(--neon-purple); }
+        .icon-dev { background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+        .icon-audio { background: rgba(255, 210, 0, 0.15); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Checklists */
+        .checklist {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.5;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--neon-green);
+            cursor: pointer;
+        }
+
+        /* Audio Transcriptions Section */
+        .section-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .section-box-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .audio-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        .audio-record-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .record-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 6px;
+            width: fit-content;
+        }
+
+        .record-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px;
+            border-radius: 8px;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+
+        audio {
+            width: 100%;
+            height: 38px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .system-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(176, 38, 255, 0.15));
+            border: 1px solid var(--neon-cyan);
+            border-radius: 16px;
+            padding: 20px 28px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .action-link-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            color: #03070d;
+            font-weight: 800;
+            padding: 12px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: all 0.25s;
+            box-shadow: 0 0 20px rgba(0, 255, 210, 0.4);
+        }
+
+        .action-link-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(0, 255, 210, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Header -->
+        <header class="plan-header">
+            <div class="brand-info">
+                <img src="assets/mr_mena_1.jpeg" alt="أستاذ مينا جرجس" class="brand-logo-img">
+                <div class="brand-text">
+                    <h1>خطة عمل وبناء سيستم <span>Mena Science 3D</span> 🔬</h1>
+                    <p>المخطط التنفيذي وتوزيع المهام لسيستم مستر مينا جرجس للمرحلة الإعدادية</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <div class="badge-live">معروض ومتاح محلياً على البورت 4217</div>
+            </div>
+        </header>
+
+        <!-- Quick Jump Navigation -->
+        <nav class="quick-nav">
+            <a href="#gfx-section"><i class="fa-solid fa-palette"></i> مهام الجرافيك والـ UI</a>
+            <a href="#3d-section"><i class="fa-solid fa-cube"></i> مهام الـ 3D والمجسمات</a>
+            <a href="#dev-section"><i class="fa-solid fa-code"></i> مهام الكودينج والبرمجة</a>
+            <a href="#audio-section"><i class="fa-solid fa-microphone-lines"></i> مهام هندسة الصوت</a>
+            <a href="#transcripts-section"><i class="fa-solid fa-file-audio"></i> تفريغ الريكوردات</a>
+            <a href="http://localhost:8000" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> فتح منصة العلوم (بورت 8000)</a>
+        </nav>
+
+        <!-- Four Team Checklists Grid -->
+        <div class="plan-grid">
+            
+            <!-- Graphic Design -->
+            <div class="plan-card" id="gfx-section">
+                <div class="card-header">
+                    <div class="card-icon icon-gfx"><i class="fa-solid fa-palette"></i></div>
+                    <div>
+                        <h3>🎨 فريق الجرافيك والـ UI/UX</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">الهوية البصرية وشاشات المعامل التفاعلية</p>
+                    </div>
+                </div>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تصميم هوية بصرية متميزة وشعار رسمي لـ <strong>Mena Science System</strong>.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تخصيص ثيمين لونيين مستقلين: التركواز والنيون (1ع) والأصفر والبرتقالي (2ع).</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تصميم واجهات المعمل التفاعلي وبطاقات الكويز الذكية بتأثيرات الزجاج (Glassmorphism).</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تجهيز رسومات الـ Vector/SVG للذرة، مدارات الطاقة، والجدول الدوري.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 3D Modeling -->
+            <div class="plan-card" id="3d-section">
+                <div class="card-header">
+                    <div class="card-icon icon-3d"><i class="fa-solid fa-cube"></i></div>
+                    <div>
+                        <h3>🧊 فريق الـ 3D والمجسمات</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">نمذجة المدرس والتجارب بـ Three.js</p>
+                    </div>
+                </div>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>نمذجة مجسم أستاذ مينا 3D من الصور الحقيقية (نظارة، ذقن مهندمة، بالطو المعمل).</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>ضبط حركة الفم والتعبيرات أثناء التحدث (Lip-Sync Speech Animation).</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>بناء مجسم الذرة التفاعلي ثلاثي الأبعاد بمدارات إلكترونات متحركة.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>محاكاة كوكب الأرض ثلاثي الأبعاد مع طبقات الغلاف الجوي والأوزون (2ع).</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Coding & Development -->
+            <div class="plan-card" id="dev-section">
+                <div class="card-header">
+                    <div class="card-icon icon-dev"><i class="fa-solid fa-code"></i></div>
+                    <div>
+                        <h3>💻 فريق الكودينج والبرمجة</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">بنية السيستم ومحرك الذكاء الاصطناعي</p>
+                    </div>
+                </div>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>بناء بنية السيستم المستقل مع الفصل التام بين منهجي 1ع و 2ع بدون إعادة تحميل.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تدريب محرك الذكاء الاصطناعي المحلي والـ Gemini API على مذكرات مستر مينا وكتاب الامتحان.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>نظام التوجيه التلقائي (Auto Navigation Trigger) لتفعيل المعمل المناسب فور سؤال الطالب.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تفعيل المايكروفون والتعرف على الصوت (Speech-to-Text) بالعامية المصرية.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Audio Engineering & Voice Cloning -->
+            <div class="plan-card" id="audio-section">
+                <div class="card-header">
+                    <div class="card-icon icon-audio"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div>
+                        <h3>🎙️ هندسة الصوت واستنساخ المدرس</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">تفريغ التسجيلات والربط المباشر</p>
+                    </div>
+                </div>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>تفريغ كافة التسجيلات الصوتية في المجلد وتصنيفها على الدروس.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>استنساخ صوت أستاذ مينا عبر سكريبت ElevenLabs وربط ملف الـ Voice ID.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>ربط مباشر: تشغيل مقطع شرح مستر مينا المسجل فور طلب درس مندليف وموزلي.</span>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>الحفاظ على سرعة الاستجابة اللحظية (0ms Latency) عبر التخزين المسبق (Pre-caching).</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Audio Transcripts & Playback Section -->
+        <section class="section-box" id="transcripts-section">
+            <div class="section-box-title">
+                <i class="fa-solid fa-file-audio" style="color: var(--neon-cyan);"></i>
+                <span>التسجيلات الصوتية المستلمة وتفريغها العلمي</span>
+            </div>
+
+            <div class="audio-cards-grid">
+                
+                <div class="audio-record-card">
+                    <div class="record-badge" style="background: rgba(0, 255, 210, 0.2); color: var(--neon-green);">التسجيل 1 • توجيهات أسلوب ونبرة الصوت</div>
+                    <div class="record-text">
+                        <strong>المحتوى:</strong> توجيهات حول جعل الصوت طبيعي وأسلوب الشرح حماسي ومحبب للطلاب، مع تفاعل المجسم بحركات متناغمة مع الشرح.
+                    </div>
+                    <audio controls src="assets/voice_note_1.ogg"></audio>
+                </div>
+
+                <div class="audio-record-card">
+                    <div class="record-badge" style="background: rgba(255, 210, 0, 0.2); color: var(--neon-yellow);">التسجيل 2 • خطة تسجيلات الدروس المستقلة</div>
+                    <div class="record-text">
+                        <strong>المحتوى:</strong> تخصيص مقطع صوتي مستقل لكل درس ومذكرات مستر مينا وكتاب الامتحان، ليرتبط كل درس بشرحه الصوتي فوراً.
+                    </div>
+                    <audio controls src="assets/voice_note_2.ogg"></audio>
+                </div>
+
+                <div class="audio-record-card">
+                    <div class="record-badge" style="background: rgba(176, 38, 255, 0.2); color: var(--neon-purple);">التسجيل 3 • شرح مستر مينا المباشر (2ع)</div>
+                    <div class="record-text">
+                        <strong>المحتوى العلمي:</strong> شرح مستر مينا بالعامية المصرية لدرس "محاولات تصنيف العناصر، جدول مندليف، جدول موزلي، والجدول الدوري الحديث".
+                    </div>
+                    <audio controls src="assets/mr_mena_sample.ogg"></audio>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- System Action Bar -->
+        <div class="system-action-bar">
+            <div>
+                <h3 style="color: #fff; font-size: 1.15rem;">🚀 سيستم مستر مينا جرجس جاهز ويعمل الآن</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">يمكنك فتح السيستم التفاعلي وتجربة المعامل الصوتية والمجسمات</p>
+            </div>
+            <a href="http://localhost:8000" target="_blank" class="action-link-btn">
+                <span>فتح السيستم التفاعلي (Mena Science)</span>
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>
